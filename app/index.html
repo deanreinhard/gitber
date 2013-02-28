@@ -14,6 +14,7 @@
         <link href='http://fonts.googleapis.com/css?family=Roboto:400,900' rel='stylesheet' type='text/css'>
         <script src="scripts/vendor/jquery.min.js"></script>
         <script src="scripts/vendor/bootstrap/bootstrap.min.js"></script>
+        <script src="scripts/vendor/async.js"></script>
         <script src="http://cloud.github.com/downloads/emberjs/ember.js/ember-0.9.6.min.js"></script>
         <style>
             h1,h2,h3,h4,h5,h6,p{
@@ -275,7 +276,7 @@
                                             <h3 class="blue" style="margin-bottom:0px;"><a target="_blank" {{bindAttr href="repoUrl"}}>{{name}}</a></h3>
                                             <p><strong>Language:</strong> {{language}}</p>
                                             <p><strong>File Size:</strong> {{size}}kb</p>
-                                            <p style="max-width:80%;"><strong>Description:</strong> {{readme}}Readme should be here
+                                            <p style="max-width:80%;"><strong>Description:</strong> {{readme}}
                                             </p>
                                             <small>Created on {{created}}</small>
                                         <div class="ribbonWrapper" style="overflow:hidden;">

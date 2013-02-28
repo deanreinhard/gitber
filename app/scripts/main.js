@@ -45,37 +45,35 @@ App.reposController = Em.ArrayController.create({
             me.set('content', []);
             $.getJSON(url,function(data){
                 me.set('content', []);
-                $(data).each(function(index,value){
-                    var repoArray = App.repo.create({
-                        name: value.name,
-                        created: value.created_at,
-                        repoUrl: value.clone_url,
-                        language: value.language,
-                        size: value.size,
-                        avatar: value.owner.avatar_url,
-                        owner: value.owner.login,
-						readme: loadRepoReadme(username, value.name)
+                async.map(
+                  data,
+                  function(repo, callback){
+                    var url = 'https://api.github.com/repos/'+username+'/'+repo.name+'/readme'+oauth;
+                    $.getJSON(url, function(readme){
+                      repo.readmeFile = $.base64Decode(readme.content);
+                      callback(null, repo);
                     });
-                    me.pushObject(repoArray);
-                })
+                  },
+                  function(error, reposWithReadme){
+                    $(reposWithReadme).each(function(index,value){
+                      var repoArray = App.repo.create({
+                          name: value.name,
+                          created: value.created_at,
+                          repoUrl: value.clone_url,
+                          language: value.language,
+                          size: value.size,
+                          avatar: value.owner.avatar_url,
+                          owner: value.owner.login,
+                          readme: value.readmeFile
+                      });
+                      me.pushObject(repoArray);
+                  });
+                });
             });
         App.githubUserController.loadUser(username);
         }
     }
 });
-
- var loadRepoReadme = function (username,repoName) {
-            var url = 'https://api.github.com/repos/'+username+'/'+repoName+'/readme'+oauth;
-            $.getJSON(url,function(data){
-                $(data).each(function(index,value){
-                    var repoReadmeArray = ({
-                        readmeFile: $.base64Decode(value.content)
-                    });
-                    return loadRepoReadme;
-                })
-            });
-        };
-
 
 App.githubUserController = Em.ArrayController.create({
     content: [],

@@ -1,79 +1,284 @@
-<!doctype html>
-<html ng-app>
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
 <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title></title>
+    <meta name="description" content=""/>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="stylesheet" href="styles/main.css"/>
+    <link rel="stylesheet" href="styles/forkit.css"/>
+    <link href='http://fonts.googleapis.com/css?family=Keania+One' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400,900' rel='stylesheet' type='text/css'>
+    <script src="scripts/vendor/jquery.min.js"></script>
+    <script src="scripts/vendor/bootstrap/bootstrap.min.js"></script>
+    <script src="scripts/vendor/async.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html">
-    <title>Github API Webapp using AngularJS - Not So Clever Demo</title>
-    <link rel="stylesheet" type="text/css" media="all" href="css/styles.css">
+    <style>
+        h1,h2,h3,h4,h5,h6,p{
+            font-family: 'Roboto', sans-serif;
+        }
+        body{
+            background: #abbac4;
+            overflow-x:hidden;
+            padding:0px !important;
+        }
+        .ribbon{
+            -webkit-transition: margin-top 0.5s;
+            -moz-transition: margin-top 0.5s;
+            -o-transition: margin-top 0.5s;
+            -ms-transition: margin-top 0.5s;
+            transition: margin-top 0.5s;
+            margin-top:-45px;
+        }
+        .ribbonWrapper{
+            position:absolute;
+            top:-10px;
+            right:10px;
+        }
+        .ribbon:hover{
+            margin-top:0;
+        }
+        .searched, #results{
+            border-radius: 10px;
+            box-shadow: 0px 0px 8px rgba(0,0,0,0.3),6px 8px 8px rgba(0,0,0,0.3);
+            padding-top:1px;
+            padding-bottom:10px;
+            margin-bottom:20px;
+        }
+        #results{
+            margin-right:10px;
+            margin-bottom:60px;
+        }
+        #results pre{
+            margin-right:20px;
+            max-height:150px;
+            overflow-y:auto;
+            overflow-x:hidden;
+            margin-top:10px;
+        }
+        .recentSearches li{
+            display:block;
+            clear:both;
+            padding: 5px 10px 8px 10px;
+            border-top:1px solid #ccc;
+            border-bottom:1px solid #ccc;
+        }
+        #results .row-fluid:nth-child(2n+2){
+            background:#eee;
+            border:0;
+            border-top:1px solid #ccc;
+            border-bottom:1px solid #ccc;
+        }
+        #results .row-fluid:nth-child(1){
+            margin-top:50px;
+        }
+        .recentSearches li:nth-child(2n+2){
+            background:#eee;
+            border-top:1px solid #ccc;
+            margin-top:-1px;
+            margin-bottom:-1px;
+        }
+        .recentSearches{
+            margin-top:-6px;
+        }
+        .lead{
+            margin-bottom:5px;
+            text-shadow:1px 1px 2px rgba(0,0,0,0.3);
+            font-weight:500;
+        }
+        blockquote{
+            border-left:0;
+            margin:0;
+            margin-bottom:35px;
+            position:relative;
+        }
+        .blue{
+            color:#0088CC;
+        }
+        .bioDropdown{
+            position:absolute;
+            top:0;
+            text-align:center;
+            display:block;
+            width:100%;
+            margin:0 auto;
+        }
+        .bioDropdown p{
+            margin-bottom:20px;
+        }
+        .row-fluid>[class*="span"]:first-of-type {
+            margin-left: 0;
+        }
+        i{
+            color:#fff !important;
+            text-shadow:1px 2px 2px rgba(0,0,0,0.3);
+        }
+        .gitber{
+            line-height:initial;
+            font-family: 'Keania One', cursive;
+            text-shadow:4px 4px 5px rgba(0,0,0,0.4);
+            color:#0099cc;
+        }
+        .gitber p{
+            font-size:2em;
+            text-shadow:2px 2px 2px rgba(0,0,0,0.4);
+            width:inherit;
+            margin:0 0 5px 0;
+        }
+        .footer{
+            box-shadow:-1px 0px 5px rgba(0,0,0,0.3);
+        }
+        #tagHeading{
+            padding:5px 0 0 0;
+            box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
+            background:#fff;
+            z-index:500;
+            width:100%;
+        }
+        .white{
+            background:#fff;
+        }
+        .emailTag img{
+            -webkit-filter: hue-rotate(50deg);
+        }
+        .blogtag img{
+            -webkit-filter: hue-rotate(100deg);
+        }
+        .localeTag img{
+            -webkit-filter: hue-rotate(160deg);
+        }
+        .hireTag img{
+            -webkit-filter: hue-rotate(290deg);
+        }
+        .phoneButtons{
+            padding:20px;
+        }
+        .phone-button a{
+            width:100px;
+            height:65px;
+            float:left;
+            margin-right:15px;
+            margin-bottom:15px;
+        }
+        .avatar{
+            position: absolute;
+            top: 50px;
+            right: 10px;
+            height:90px;
+            width:90px;
+        }
+        #gitber1{color:#0088cc;}
+        #gitber2{font-size:50%;}
+        #gitber3{font-size:50%;}
+        #gitber4{color:#0088cc;}
+        #gitber5{font-size:50%;}
+        #gitber6{font-size:50%;}
+        #gitber7{color:#0088cc;}
+        #gitber8 i{color:#0099cc !important; text-shadow:6px 6px 15px rgba(0,0,0,0.3)}
+        #fitHeader{margin:0;}
+        .container{overflow:hidden;}
+        *::-webkit-scrollbar{width:10px;}
+        *::-webkit-scrollbar-track{background:#ccc;}
+        *::-webkit-scrollbar-button{height:15px;border:3px solid #457e82;border-radius:8px;background:#FFF;}
+        *::-webkit-scrollbar-thumb{border-radius:10px;background:#457e82;}
+        #userData{margin-bottom:150px;}
+    </style>
 </head>
+<body>
+<div class="gitber container" id="tagHeading" style="position:fixed; text-align:center;" data-0="margin-top:-50px;" data-anchor-target="#fitHeader" data-50-top-bottom="margin-top:-50px;" data--250-top-bottom="margin-top:0px;">
+    <p>GitBer!</p>
+</div>
+<div class="container" ng-app="gitber">
 
-<body ng-controller="GitHubCtrl">
-
-<div id="w">
-    <div>
-        <h1>Simple Github API Webapp</h1>
-        <p>Enter a single Github username below and click the button to display profile info.</p>
-        <input type="text" id="ghusername" ng-model="username" placeholder="Github username..."><br />
-        <a href="#" id="ghsubmitbtn" ng-click="getGitInfo()">Pull Single User Data</a><br />
-        <a href="#" id="ghsubmitbtn" ng-click="getGitOrgInfo()">Pull Organization Data</a>
-
-        <div id="ghapidata" class="clearfix"></div>
+    <div class="row-fluid" style="text-align:center;">
+        <p class="gitber" id="fitHeader"><span id="gitber1">G</span><span id="gitber2">i</span><span id="gitber3">t</span><span id="gitber4">B</span><span id="gitber5">e</span><span id="gitber6">r</span><span id="gitber7">!</span><span id="gitber8"><i class="icon-github"></i></span></p>
     </div>
-
-    <!-- Repo info    -->
-    <div ng-show="userNotFound">
-        <h2>No User Info Found</h2>
-    </div>
-    <div ng-show="loaded">
-
-        <h2> {{user.name}}
-            <span class="smallname">(@<a href="{{user.html_url}}" target="_blank"> {{user.login}} </a>)</span>
-        </h2>
-
-        <div class="ghcontent">
-            <div class="avi">
-                <a href="{{ user.html_url }}" target="_blank">
-                    <img src="{{ user.avatar_url }}" width="80" height="80" alt="{{ user.login }}"></a>
-            </div>
-            User Name : {{user.login}} <br>
-            Followers: {{ user.followers }} - Following: {{ user.following }}<br>
-            Repos: {{ user.public_repos }}<br>
-            Join date: {{ user.created_at | date:'yyyy-MM-dd HH:mm:ss Z'}}<br>
-            Email : {{user.email}}<br>
-            Blog : {{user.blog}}<br>
-            Location : {{user.location}}<br>
-        </div>
-    </div>
-
-    <!-- Members list    -->
-    <div class="span8">
-        <div class="row-fluid">
-            <div id="results2" class="white">
-                <div ng-show="memberNotFound">
-                    <h2>No Member Found</h2>
-                </div>
-                <div ng-show="membersFound">
-                    <p><strong>Members List:</strong></p>
-                    <ul ng-repeat="member in members">
-                        <li class="atleta">
-                            <a href="#" name="{{member.login}}" ng-click="getGitMemInfo(member.login, $event)" >{{member.login}}</a>
-                        </li>
-                    </ul>
+    <div class="row-fluid"  ng-controller="GitInfoController">
+        <div class="span4">
+            <div>
+                <div class="row-fluid" >
+                    <div class="searched white">
+                        <div class="input-append" style="margin-top:15px; padding-left:10px;">
+                            <input type="text" name="ghusername" id="ghusername" placeholder="Github username..."class="span8" ng-model="username">
+                            <button class="btn btn-info" ng-click="getGitInfo()">Go!</button>
+                        </div>
+                        <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">Recent Searches</p>
+                        <ul class="unstyled recentSearches table-striped">
+                            <script type="text/x-handlebars">
+                                {{#each App.recentUsersController.reverse}}
+                                    <li>
+                                        <a href="#" title="view again" {{action "searchAgain" target="App.recentUsersController"}}>{{this}}</a>  <a class="btn btn-info btn-mini pull-right" href="#" title="remove" {{action "removeUser" target="App.recentUsersController"}}>X</a>
+                                    </li>
+                                {{/each}}
+                                </script>
+                        </ul>
+                    </div>
                 </div>
 
+                <div class="row-fluid" >
+                    <div class="searched white">
+                        <div class="input-append" style="margin-top:15px; padding-left:10px;">
+                            <input type="text" name="ghorgname" id="ghorgname" placeholder="Organisation username..."class="span8" ng-model="orgname">
+                            <button class="btn btn-info" ng-click="getGitOrgInfo()">Go!</button>
+                        </div>
+                        <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">Organisation Members</p>
+                        <div ng-show="memberNotFound">
+                            <h2>No Member Found</h2>
+                        </div>
+                        <div ng-show="membersFound">
+                            <ul ng-repeat="member in members" class="unstyled recentSearches table-striped" style="max-height:171px; overflow:auto;">
+                                <li class="atleta">
+                                    <a href="#" name="{{member.login}}" ng-click="getGitMemInfo(member.login, $event)" >{{member.login}}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row-fluid" style="position:relative;">
+                    <div id="userData" class="searched white">
+                        <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">User Bio</p>
+                        <div ng-show="loaded">
+                            <div class="row-fluid">
+                                <div class="span12" style="padding-left:10px;padding-right:100px;">
+
+                                    <p ng-if='user.login'><strong>Name:</strong> {{user.login}} </p>
+                                    <p ng-if='user.login'><strong>Username:</strong> {{user.login}} </p>
+                                    <p ng-if='user.company'><strong>Company:</strong> {{ user.company }}</p>
+                                    <p ng-if='user.public_repos'><strong>Repos:</strong> {{ user.public_repos}} </p>
+                                    <p ng-if='user.followers'><strong>Followers:</strong> {{ user.followers }}</p>
+                                    <p ng-if='user.created_at'><strong>Joined on:</strong> {{ user.created_at | date:'yyyy-MM-dd HH:mm:ss Z'}}</p>
+                                </div>
+
+                                <img class="avatar img-polaroid" src="{{ user.avatar_url }}"  alt="{{ user.login }}"></a>
+
+                            </div>
+
+                            <div class="row-fluid visible-phone phoneButtons">
+                                <div class="phone-button" ng-if='user.email'>
+                                    <a class="btn btn-primary btn-large" href="mailto:{{user.email}}"><i class="icon-envelope-alt icon-4x"></i></a>
+                                </div>
+                                <div class="phone-button" ng-if='user.blog'>
+                                    <a class="btn btn-warning btn-large" href="{{user.blog}}" target="_blank"><i class="icon-comments icon-4x"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Repos list    -->
-    <div class="span8">
-        <div class="row-fluid">
-            <div id="results" class="white">
-                <div ng-show="reposFound">
-                    <p><strong>Repos List:</strong></p>
-                    <ul ng-repeat="repo in repos">
-                        <li>
+
+        <div class="span8">
+            <div class="row-fluid">
+                <div id="results" class="white">
+                    <p style="padding:5px 10px; border-bottom:1px solid #ccc;  margin-bottom:-1px;" class="lead blue">User Repositories</p>
+                    <div ng-show="reposFound">
+                        <div ng-repeat="repo in repos">
                             <div class="row-fluid">
                                 <div class="repo">
                                     <div class="span12 repoDetails">
@@ -87,95 +292,80 @@
                                                     <pre>{{repo.readmeFile}}</pre>
                                                 </div>
                                             </div>
+
                                             <small>Created on {{repo.created_at | date:'yyyy-MM-dd HH:mm:ss Z'}}</small>
+                                            <div class="ribbonWrapper" style="overflow:hidden;">
+                                                <a target="_blank" {{repo.clone_url}}><img class="ribbon" src="images/fork.png" alt="Fork me on GitHub"></a>
+                                            </div>
                                         </blockquote>
                                     </div>
                                 </div>
                             </div>
-                        </li>
-                    </ul>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </div>
 
+
+    </div>
+</div>
+
+<div class="forkit-curtain">
+    <div class="close-button"></div>
+    <div class="container">
+        <div class="row-fluid">
+            <div class="span3">
+
+            </div>
+            <div class="span6">
+                <h1 class="blue">Information about GitBer goes here</h1>
             </div>
         </div>
     </div>
-
-    Credit to : <a href="http://code.notsoclever.cc/simple-github-api-webapp-angularjs-style/">http://code.notsoclever.cc/simple-github-api-webapp-angularjs-style/</a>
 </div>
 
+<!-- The ribbon -->
+<a class="forkit" data-text="About" data-text-detached="Drag down >" href="https://github.com/hakimel/forkit.js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://a248.e.akamai.net/camo.github.com/e6bef7a091f5f3138b8cd40bc3e114258dd68ddf/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub"></a>
 
+<script src="js/forkit.js"></script>
+<div class="footer gitber" style="position:fixed; bottom:0px; left:0px; background:#fff; height:40px; width:100%; text-align:center;">
+    <p>footer!</p>
+</div>
+<!--[if lt IE 7]>
+<p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+
+<!-- build:js scripts/scripts.js -->
+<script src="scripts/vendor/base64.js"></script>
+<script src="scripts/vendor/jquery.fittext.js"></script>
+<script src="scripts/vendor/forkit.js"></script>
+<script src="scripts/main_an.js"></script>
+<script src="scripts/vendor/skrollr.min.js"></script>
 <script>
-    function GitHubCtrl($scope, $http) {
-        $scope.client='69af424226e15a6396dd';
-        $scope.secret='683d05837403207f247939ab21668065352b65db';
-        $scope.oauth = '?client_id=' + $scope.client+'&client_secret=' + $scope.secret;
-        var url;
-        /*
-        Getting the Single Git repo
-         */
-        $scope.getGitInfo = function () {
-            $scope.repos = null;
-            $scope.reposFound = false;
-            $scope.members = null;
-            $scope.membersFound = false;
-            $scope.memberNotFound = false;
-            getrepos($scope.username);
-        };
 
-        /*
-         Getting the Member info by Organization
-         */
-        $scope.getGitMemInfo = function(username, event) {
-            getrepos(username);
-        };
-
-        /*
-         Getting the Oranization Git repo
-         */
-        $scope.getGitOrgInfo = function () {
-            $scope.repos = null;
-            $scope.reposFound = false;
-            getrepos($scope.username);
-
-            $scope.memberNotFound = false;
-
-            url = 'https://api.github.com/orgs/' + $scope.username + '/members' + $scope.oauth;
-
-            $http.get(url).success(function (data) {
-                $scope.members = data;
-                $scope.membersFound = data.length > 0;
-            })
-                .error(function () {
-                    $scope.memberNotFound = true;
-                });
-        };
-
-        function getrepos(username){
-            $scope.userNotFound = false;
-            $scope.loaded = false;
-            if(typeof username != 'undefined') {
-
-                url = "https://api.github.com/users/" + username + $scope.oauth;
-                $http.get(url).success(function (data) {
-                    if (data.name == "") data.name = data.login;
-                    $scope.user = data;
-                    $scope.loaded = true;
-                })
-                    .error(function () {
-                        $scope.userNotFound = true;
-                    });
-                url = "https://api.github.com/users/" + username + '/repos' + $scope.oauth;
-                $http.get(url).success(function (data) {
-
-                    $scope.repos = data;
-                    $scope.reposFound = data.length > 0;
-                });
-            }else{
-                $scope.userNotFound = true;
-            }
-         }
-    }
+    $(function() {
+        $("#fitHeader").fitText(0.7);
+        skrollr.init({
+            forceHeight: false
+        });
+    });
 </script>
+<!--script src="scripts/routes/app-router.js"></script>
+<script src="scripts/store.js"></script>
+<script src="scripts/controllers/application-controller.js"></script>
+<script src="scripts/models/application-model.js"></script>
+<script src="scripts/views/application-view.js"></script-->
+<!-- endbuild -->
 
+<!-- Google Analytics: change UA-XXXXX-X to be your site's ID.
+<script>
+    var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+    g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+    s.parentNode.insertBefore(g,s)}(document,'script'));
+</script> -->
 </body>
 </html>

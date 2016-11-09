@@ -16,7 +16,7 @@
         <script src="scripts/vendor/jquery.min.js"></script>
         <script src="scripts/vendor/bootstrap/bootstrap.min.js"></script>
         <script src="scripts/vendor/async.js"></script>
-        <script src="http://cloud.github.com/downloads/emberjs/ember.js/ember-0.9.6.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
         <style>
             h1,h2,h3,h4,h5,h6,p{
                 font-family: 'Roboto', sans-serif;    
@@ -188,7 +188,7 @@
 			#userData{margin-bottom:150px;}
         </style>
     </head>
-    <body>
+    <body ng-app="app" ng-controller="controller">
 	<div class="gitber container" id="tagHeading" style="position:fixed; text-align:center;" data-0="margin-top:-50px;" data-anchor-target="#fitHeader" data-50-top-bottom="margin-top:-50px;" data--250-top-bottom="margin-top:0px;">
 				<p>GitBer!</p>
 	</div>
@@ -203,20 +203,14 @@
                     <div class="row-fluid" >
                         <div class="searched white">
                             <div class="input-append" style="margin-top:15px; padding-left:10px;">
-                                <script type="text/x-handlebars"> 
-                                {{view App.SearchTextField placeholder="Github username" valueBinding="App.reposController.username" class="span8"}}
-                                <button class="btn btn-info" {{action "loadrepos" target="App.reposController"}}>Go!</button>
-                                </script>
+                                <input ng-enter="loadrepos(username)" class="form-control span8" type="text" placeholder="Github username" ng-model="username" />
+                                <button class="btn btn-info" ng-click="loadrepos(username)">Go!</button>
                             </div>
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">Recent Searches</p>
                             <ul class="unstyled recentSearches table-striped"> 
-                                 <script type="text/x-handlebars"> 
-                                {{#each App.recentUsersController.reverse}} 
-                                    <li> 
-                                        <a href="#" title="view again" {{action "searchAgain" target="App.recentUsersController"}}>{{this}}</a>  <a class="btn btn-info btn-mini pull-right" href="#" title="remove" {{action "removeUser" target="App.recentUsersController"}}>X</a> 
-                                    </li> 
-                                {{/each}} 
-                                </script>
+                                <li ng-repeat="user in recentUsers"> 
+                                        <a href="#" title="view again" ng-click="searchAgain(user)">{{user}}</a>  <a class="btn btn-info btn-mini pull-right" href="#" title="remove" ng-click="removeUser(user)">X</a> 
+                                </li> 
                             </ul>
                         </div>  
                     </div>
@@ -224,20 +218,14 @@
 					<div class="row-fluid" >
                         <div class="searched white">
                             <div class="input-append" style="margin-top:15px; padding-left:10px;">
-                                <script type="text/x-handlebars"> 
-                                {{view App.OrganisationSearchTextField placeholder="Organisation Name" valueBinding="App.organisationUserController.organisation" class="span8"}}
-                                <button class="btn btn-info" {{action "loadOrganisation" target="App.organisationUserController"}}>Go!</button>
-                                </script>
+                                <input class="form-control span8" type="text" placeholder="Organisation Name" ng-model="organisation" ng-enter="loadOrganisation(organisation)" />
+                                <button class="btn btn-info" ng-click="loadOrganisation(organisation)" >Go!</button>
                             </div>
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">Organisation Members</p>
                             <ul class="unstyled recentSearches table-striped" style="max-height:171px; overflow:auto;"> 
-                                 <script type="text/x-handlebars"> 
-                                 {{#each App.organisationUserController}}
-                                    <li> 
-                                        <a href="#" title="view repos" {{action "searchOrgUser" target="App.organisationUserController"}}>{{orgUsername}}</a>
+                                    <li ng-repeat="orgMember in organisationUserArray"> 
+                                        <a href="#" title="view repos" ng-click="loadrepos(orgMember.login)">{{orgMember.login}}</a>
                                     </li> 
-                                {{/each}} 
-                                </script>
                             </ul>
                         </div>  
                     </div>
@@ -248,75 +236,55 @@
                     <div class="row-fluid" style="position:relative;">
                         <div id="userData" class="searched white">
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">User Bio</p>
-                             <script type="text/x-handlebars"> 
-                            {{#each App.githubUserController}}
-                                <div class="row-fluid">
+                                <div class="row-fluid" ng-if="githubUser.login">
                                     <div class="span12" style="padding-left:10px;padding-right:100px;">
-										{{#if name}}<p><strong>Name:</strong> {{name}}</p>{{/if}}
-                                        <p><strong>Username:</strong> {{username}}</p>
-                                        {{#if company}}<p><strong>Company:</strong> {{company}}</p>{{/if}}
-                                        <p><strong>Repos:</strong> {{repos}}</p>
-                                        <p><strong>Followers:</strong> {{followers}}</p>
-                                        <p><strong>Joined on:</strong> {{joined}}</p>
+										<p><strong>Name:</strong> {{githubUser.name}}</p>
+                                        <p><strong>Username:</strong> {{githubUser.login}}</p>
+                                        <p><strong>Company:</strong> {{githubUser.company}}</p>
+                                        <p><strong>Repos:</strong> {{githubUser.public_repos}}</p>
+                                        <p><strong>Followers:</strong> {{githubUser.followers}}</p>
+                                        <p><strong>Joined on:</strong> {{githubUser.created_at}}</p>
                                     </div>
                                     
-                                        <img class="avatar img-polaroid" {{bindAttr src="avatar"}} />
+                                        <img class="avatar img-polaroid" ng-src="{{githubUser.avatar_url}}" />
                                     
                                 </div>
                                 <div class="row-fluid visible-phone phoneButtons">
                                     <div class="phone-button">
-                                        {{#if email}}
-											<a class="btn btn-primary btn-large" href="mailto:{{unbound email}}"><i class="icon-envelope-alt icon-4x"></i></a>
-										{{/if}}   
+											<a class="btn btn-primary btn-large" ng-href="mailto:{{email}}"><i class="icon-envelope-alt icon-4x"></i></a>
                                     </div>
                                     <div class="phone-button">
-										 {{#if blog}}
-											<a class="btn btn-warning btn-large" href="{{unbound blog}}" target="_blank"><i class="icon-comments icon-4x"></i></a>
-										 {{/if}}   
+											<a class="btn btn-warning btn-large" ng-href="{{blog}}" target="_blank"><i class="icon-comments icon-4x"></i></a>
                                     </div>
                                     <div class="phone-button">
-                                        {{#if location}}
-											<a class="btn btn-danger btn-large" href="{{unbound location}}" target="_blank"><i class="icon-map-marker icon-4x"></i></a>
-										{{/if}}
+											<a class="btn btn-danger btn-large" ng-href="{{location}}" target="_blank"><i class="icon-map-marker icon-4x"></i></a>
                                     </div>
                                     <div class="phone-button">
-										{{#if hireable}}
-												<a class="btn btn-inverse btn-large" href="{{unbound blog}}" target="_blank"><i class="icon-suitcase icon-4x"></i></a>
-										{{/if}}	
+												<a class="btn btn-inverse btn-large" ng-href="{{blog}}" target="_blank"><i class="icon-suitcase icon-4x"></i></a>
                                     </div>
                                 </div>
 								<div class="row-fluid hidden-phone" style="position:absolute; margin-top:10px;overflow:hidden;">
-									{{#if email}}
 										<div class="span3">
 											<div class="ribbon emailTag" style="position:relative;">
-												<a href="mailto:{{unbound email}}"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Email</p><i class="icon-envelope-alt icon-2x"></i></span></a>
+												<a href="mailto:{{email}}"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Email</p><i class="icon-envelope-alt icon-2x"></i></span></a>
 											</div>
 										</div>
-									{{/if}}
-									{{#if blog}}
 										<div class="span3">
 											<div class="ribbon blogtag" style="position:relative;">
-												<a href="{{unbound blog}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Blog</p><i class="icon-comments icon-2x"></i></span></a>
+												<a href="{{blog}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Blog</p><i class="icon-comments icon-2x"></i></span></a>
 											</div>
 										</div>
-									{{/if}}
-									{{#if location}}
 										<div class="span3">
 											<div class="ribbon localeTag" style="position:relative;">
-												<a href="{{unbound location}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Locale</p><i class="icon-map-marker icon-2x"></i></span></a>
+												<a href="{{location}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Locale</p><i class="icon-map-marker icon-2x"></i></span></a>
 											</div>
 										</div>
-									{{/if}}
-									{{#if hireable}}
 										<div class="span3">
 											<div class="ribbon hireTag" style="position:relative;">
-												<a href="{{unbound blog}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead"  style="color:#fff;">Hire</p><i class="icon-suitcase icon-2x"></i></span></a>
+												<a href="{{blog}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead"  style="color:#fff;">Hire</p><i class="icon-suitcase icon-2x"></i></span></a>
 											</div>
 										</div>
-									{{/if}}
 								</div>	
-                            {{/each}} 
-                            </script>  
                         </div>
                     </div>
 					</div>
@@ -326,32 +294,28 @@
 					
                         <div id="results" class="white">
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;  margin-bottom:-1px;" class="lead blue">User Repositories</p>
-                             <script type="text/x-handlebars"> 
-                        {{#each App.reposController}}
-                            <div class="row-fluid">
+                            <div class="row-fluid" ng-repeat="repo in userRepos">
                                 <div class="repo"> 
                                     <div class="span12 repoDetails">
                                         <blockquote>
-                                            <h3 class="blue" style="margin-bottom:0px;"><a target="_blank" {{bindAttr href="repoUrl"}}>{{name}}</a></h3>
-                                            <p><strong>Language:</strong> {{language}}</p>
-                                            <p><strong>File Size:</strong> {{size}}kb</p>
+                                            <h3 class="blue" style="margin-bottom:0px;"><a target="_blank" ng-href="repo.html_url">{{repo.name}}</a></h3>
+                                            <p><strong>Language:</strong> {{repo.language}}</p>
+                                            <p><strong>File Size:</strong> {{repo.size}}kb</p>
                                             <p><strong>Description:</strong></p> 
 											<div class="row-fluid">
 												<div class="span10">
-													<pre>{{readme}}</pre>
+													<pre>{{repo.readme}}</pre>
 												</div>
 											</div>	
                                             
-                                            <small>Created on {{created}}</small>
+                                            <small>Created on {{repo.created_at}}</small>
                                         <div class="ribbonWrapper" style="overflow:hidden;">
-                                         <a target="_blank" {{bindAttr href="repoUrl"}}><img class="ribbon" src="images/fork.png" alt="Fork me on GitHub"></a>
+                                         <a target="_blank" ng-href="repo.forks_url"}}><img class="ribbon" src="images/fork.png" alt="Fork me on GitHub"></a>
                                         </div>
                                         </blockquote>
                                     </div>
                                 </div>
                             </div>   
-                            {{/each}}
-                            </script>
                         </div>
                     </div>     
                 </div>    
@@ -376,7 +340,7 @@
         <!-- The ribbon -->
         <a class="forkit" data-text="About" data-text-detached="Drag down >" href="https://github.com/hakimel/forkit.js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://a248.e.akamai.net/camo.github.com/e6bef7a091f5f3138b8cd40bc3e114258dd68ddf/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub"></a>
 
-        <script src="js/forkit.js"></script>
+        <script src="scripts/vendor/forkit.js"></script>
     <div class="footer gitber" style="position:fixed; bottom:0px; left:0px; background:#fff; height:40px; width:100%; text-align:center;">
 				<p>footer!</p>
 	</div>
@@ -390,7 +354,8 @@
         <script src="scripts/vendor/base64.js"></script>
         <script src="scripts/vendor/jquery.fittext.js"></script>
         <script src="scripts/vendor/forkit.js"></script>
-        <script src="scripts/main.js"></script>
+        <script src="scripts/vendor/angular-utf8-base64.js"></script>   
+        <script src="scripts/angularApp.js"></script>
         <script src="scripts/vendor/skrollr.min.js"></script>
         <script>
         

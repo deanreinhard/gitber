@@ -8,6 +8,6 @@ Ember.js
 SCSS
 Bootstrap
 Grunt.js
-
+--------------------------------------------------------
 Challenge: Replace Ember code with AngularJS code
 

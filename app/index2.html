@@ -198,7 +198,7 @@
 	
 	<!--<div class="gitber container" id="tagHeading" style="position:fixed; text-align:center;" data-0="margin-top:-50px;" data-anchor-target="#fitHeader" data-50-top-bottom="margin-top:-50px;" data--250-top-bottom="margin-top:0px;">
 				<p>GitBer!</p>
-	</div>-->
+	</div> removed it in order to get good visibility in my local machine -->
     <div class="container" >
 			
             <div class="row-fluid" style="text-align:center;">
@@ -213,12 +213,16 @@
                              
                                 <input type="text" ng-model="username"></input>
                                 <button class="btn btn-info" ng-click="search()">Go!</button>
-                               
+                               <!--used this to call search, which will all the user to userSearch Array -->
                             </div>
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">Recent Searches</p>
                             <ul class="unstyled recentSearches table-striped"> 
-                                 <input type="text" ng-model="recentSearch"></input>
-                                <button class="btn btn-info" ng-click="searchAgain(recentSearch)">Go!</button>
+                                  <!--once the user is inserted into userSearch we show last in first out way. ng-repeat to iterate Over users -->
+								  <li ng-repeat="name in recentSearch.slice().reverse() track by $index"> 
+                                        <a ng-href="#"  ng-click="searchAgain(name)" title="view again">{{name}}</a>  <a class="btn btn-info btn-mini pull-right" href="#" ng-click="remove($index)" title="remove" >X</a> 
+										  <!--used this to call searchAgain with username and remove them using index of the array -->
+                                    </li> 
+                                
                             </ul>
                         </div>  
                     </div>
@@ -229,12 +233,12 @@
                                <input type="text" ng-model="organisation">
                                 
                                 <button class="btn btn-info" ng-click="organisationSearch(organisation)">Go!</button>
-                               
+                               <!--Used to search Organisation by name -->
                             </div>
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">Organisation Members</p>
                             <ul class="unstyled recentSearches table-striped" style="max-height:171px; overflow:auto;"> 
-                               
-                                    <li ng-repeat="member in members"> 
+                               <!--Show all members in organisation using ng-repeat. Upon clicking the member will take to searchAgain method-->
+                                    <li ng-repeat="member in members track by $index"> 
                                         <a href="#" title="view repos" ng-click="searchAgain(member.name)">{{member.name}}</a>
                                     </li> 
                         
@@ -250,7 +254,7 @@
                         <div id="userData" class="searched white">
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">User Bio</p>
                            
-								
+								<!--Mapped the json value to the user array and showed corresponding details-->
                                 <div class="row-fluid">
                                     <div class="span12" style="padding-left:10px;padding-right:100px;">
 										<p><strong>Name:</strong> {{user.name}}</p>
@@ -267,9 +271,9 @@
 								
 
                                 <div class="row-fluid visible-phone phoneButtons">
-                                    <div class="phone-button">
+                                    <div class="phone-button" ng-show="{{user.email}}">
                                         
-											<a class="btn btn-large" href="mailto:"><i class="icon-envelope-alt icon-4x"></i></a>
+											<a class="btn btn-large" ng-href="{{user.email}}"><i class="icon-envelope-alt icon-4x"></i></a>
 									  
                                     </div>
                                     <div class="phone-button">
@@ -289,28 +293,28 @@
                                     </div>
                                 </div>
 								<div class="row-fluid hidden-phone" style="position:absolute; margin-top:10px;overflow:hidden;">
-									
+									<!-- used ng-hide to show only the ribbon with values-->
 										<div class="span3">
-											<div class="ribbon emailTag" style="position:relative;">
-												<a href="mailto:"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Email</p><i class="icon-envelope-alt icon-2x"></i></span></a>
+											<div class="ribbon emailTag" style="position:relative;" ng-show="{{user.email}}">
+												<a ng-href="{{user.email}}"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Email</p><i class="icon-envelope-alt icon-2x"></i></span></a>
 											</div>
 										</div>
 									
 										<div class="span3">
-											<div class="ribbon blogtag" style="position:relative;">
-												<a href="" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Blog</p><i class="icon-comments icon-2x"></i></span></a>
+											<div class="ribbon blogtag" style="position:relative;" ng-show="{{user.blog}}">
+												<a ng-href="{{user.blog}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Blog</p><i class="icon-comments icon-2x"></i></span></a>
 											</div>
 										</div>
 									
 										<div class="span3">
-											<div class="ribbon localeTag" style="position:relative;">
-												<a href="" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Locale</p><i class="icon-map-marker icon-2x"></i></span></a>
+											<div class="ribbon localeTag" style="position:relative;" ng-show="{{user.location}}">
+												<a href="{{user.location}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Locale</p><i class="icon-map-marker icon-2x"></i></span></a>
 											</div>
 										</div>
 									
 										<div class="span3">
-											<div class="ribbon hireTag" style="position:relative;">
-												<a href="" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead"  style="color:#fff;">Hire</p><i class="icon-suitcase icon-2x"></i></span></a>
+											<div class="ribbon hireTag" style="position:relative;" ng-show="{{user.hireable}}">
+												<a ng-href="{{user.hireable}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead"  style="color:#fff;">Hire</p><i class="icon-suitcase icon-2x"></i></span></a>
 											</div>
 										</div>
 									
@@ -325,7 +329,7 @@
 					
                         <div id="results" class="white">
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;  margin-bottom:-1px;" class="lead blue">User Repositories</p>
-                           
+                           <!--used ng-repeat to iterate over elements and show the details of repository-->
                       <div ng-repeat="cont in content">
                             <div class="row-fluid">
                                 <div class="repo"> 
@@ -336,8 +340,8 @@
                                             <p><strong>File Size:</strong> {{cont.size}}kb</p>
                                             <p><strong>Description:</strong></p> 
 											<div class="row-fluid">
-												<div class="span10">
-													<pre>{{cont.readme}}</pre>
+												<div class="span10" >
+													<pre>{{cont.readme}}{{value}}</pre>
 												</div>
 											</div>	
                                            

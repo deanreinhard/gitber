@@ -7,12 +7,12 @@ var client='69af424226e15a6396dd';
 var secret='683d05837403207f247939ab21668065352b65db';
 var oauth = '?client_id='+client+'&client_secret='+secret;
 $scope.recentSearch = [];
- $scope.readmeFile=[];
- $scope.value="";
+ 
+ 
 $scope.search = function(){
 		//Added username to array to display in the recent search 
 	
-	$scope.recentSearch.push($scope.username);
+	$scope.searchAgain($scope.username);
 }
 
 $scope.searchAgain = function(username){
@@ -27,40 +27,54 @@ $scope.searchAgain = function(username){
 			$scope.recentSearch.pop();
 			
 		$scope.content=[];
+		
 		if(username)
 		  var url = 'https://api.github.com/users/'+username+'/repos'+oauth;
 		  
+		
+		   
 		$http.get(url).success(function(data){
 		console.log(data);
 		//used angular ng-model to map in HTML page. So i am setting the key based on the ng-model name in index2.html
 		angular.forEach(data, function(value, key){
 						var val = value;
 						console.log("var"+val.name+key)
-						$scope.content.push({name: value.name,
+						var x=({name: value.name,
 								  created: value.created_at,
 								  repoUrl: value.clone_url,
 								  language: value.language,
 								  size: value.size,
 								  avatar: value.owner.avatar_url,
-								  owner: value.owner.login,
-								  readme: $scope.decodeReadMe(value.name,username)});
-						
-					   
+								  owner: value.owner.login});// $scope.decodeReadMe(value.name,username)});
+				   
+						var y = $scope.decodeReadMe(value.name,username);
+						//$scope.repoNameList.push(value.name);
+						console.log("Decoded y"+y);
+						x.readme=y;
+						console.log("Decoded "+y);
+						$scope.content.push(x);
+						console.log($scope.repoNameList);
+								   
 					   
 		   });
 
 		}).error(function(data){
 		console.log(data);
 		});
+		
+		
 		//Calling $scope function to display user details
 		$scope.setuser(username);
+		
 }
 
 $scope.remove = function(index){
 		//used to remove the element given by X button in recentSearch array //It works fine for 2nd to last element to so on... but when used track by index with reverse have issue with angular 1.5. for 1st element removal 
 		$scope.recentSearch.splice(index,1);
+		//$scope.recentSearch.pop();
 }
 $scope.decodeReadMe=function(repoName,username){
+console.log(repoName+" "+username);
 var val="";
 //call this function during setting values in searchAgain method for readme. able to print decoded value but the method not returning the string
 	if(repoName)
@@ -128,6 +142,6 @@ if ( organisation )
 
 }
 
-//use Base64 plugin mormally in Angular 
+ 
 	
 })

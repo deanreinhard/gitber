@@ -2,11 +2,12 @@
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<!--[if gt IE 8]><!--> <html> <!--<![endif]-->
     <head>
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
         <title></title>
+         
         <meta name="description" content=""/>
         <meta name="viewport" content="width=device-width"/>
         <link rel="stylesheet" href="styles/main.css"/>
@@ -16,7 +17,13 @@
         <script src="scripts/vendor/jquery.min.js"></script>
         <script src="scripts/vendor/bootstrap/bootstrap.min.js"></script>
         <script src="scripts/vendor/async.js"></script>
-        <script src="http://cloud.github.com/downloads/emberjs/ember.js/ember-0.9.6.min.js"></script>
+  <!-- Janani - Removed ember.js 
+        <script src="http://cloud.github.com/downloads/emberjs/ember.js/ember-0.9.6.min.js"></script> -->
+  <!-- Janani - Included angular.js -->
+       <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+       
+       
+       
         <style>
             h1,h2,h3,h4,h5,h6,p{
                 font-family: 'Roboto', sans-serif;    
@@ -189,34 +196,46 @@
         </style>
     </head>
     <body>
-	<div class="gitber container" id="tagHeading" style="position:fixed; text-align:center;" data-0="margin-top:-50px;" data-anchor-target="#fitHeader" data-50-top-bottom="margin-top:-50px;" data--250-top-bottom="margin-top:0px;">
+    <!-- Janani - ng-app or data-ng-app -->
+    <div data-ng-app="gitBerApp" >
+		<div  class="gitber container" id="tagHeading" style="position:fixed; text-align:center;" data-0="margin-top:-50px;" data-anchor-target="#fitHeader" data-50-top-bottom="margin-top:-50px;" data--250-top-bottom="margin-top:0px;">
 				<p>GitBer!</p>
 	</div>
-    <div class="container">
-			
-            <div class="row-fluid" style="text-align:center;">
+	
+	<!--  Janani - ng-controller or data-ng-controller -->
+    <div  data-ng-controller="recentSearch" class="container">
+		  
+            <div class="row-fluid" style="text-align:center;padding:0.5em 7em 2em 8em">
                 <p class="gitber" id="fitHeader"><span id="gitber1">G</span><span id="gitber2">i</span><span id="gitber3">t</span><span id="gitber4">B</span><span id="gitber5">e</span><span id="gitber6">r</span><span id="gitber7">!</span><span id="gitber8"><i class="icon-github"></i></span></p>
             </div>        
-            <div class="row-fluid">
+            <div class="row-fluid" >
                 <div class="span4">
 				<div>
                     <div class="row-fluid" >
                         <div class="searched white">
-                            <div class="input-append" style="margin-top:15px; padding-left:10px;">
-                                <script type="text/x-handlebars"> 
-                                {{view App.SearchTextField placeholder="Github username" valueBinding="App.reposController.username" class="span8"}}
+                            <div  class="input-append" style="margin-top:15px; padding-left:10px;">
+                     <!-- Janani - Modified ember.js code of loadrepos to angular.js binding and method call -->
+                            Github UserName: <input data-ng-model="username" type=text></input>
+                            	<button data-ng-click="loadreposi()">Go!</button>
+                            <!--       <script type="text/x-handlebars"> 
+                             {{view App.SearchTextField placeholder="Github username" valueBinding="App.reposController.username" class="span8"}}
                                 <button class="btn btn-info" {{action "loadrepos" target="App.reposController"}}>Go!</button>
-                                </script>
+                                </script> -->
                             </div>
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">Recent Searches</p>
                             <ul class="unstyled recentSearches table-striped"> 
-                                 <script type="text/x-handlebars"> 
+                            	
+                         <!--         <script type="text/x-handlebars"> 
                                 {{#each App.recentUsersController.reverse}} 
                                     <li> 
                                         <a href="#" title="view again" {{action "searchAgain" target="App.recentUsersController"}}>{{this}}</a>  <a class="btn btn-info btn-mini pull-right" href="#" title="remove" {{action "removeUser" target="App.recentUsersController"}}>X</a> 
                                     </li> 
                                 {{/each}} 
-                                </script>
+                                </script> -->
+                                <!-- Janani - display of list using Angular.js  -->
+                                 <li data-ng-repeat="x in recentList | orderBy:'name':true"> 
+                                        <a href="#" title="view again" data-ng-bind="x.name"></a>  <a class="btn btn-info btn-mini pull-right"  href="#" title="remove" data-ng-click="remove(x)">X</a> 
+                                    </li> 
                             </ul>
                         </div>  
                     </div>
@@ -224,20 +243,28 @@
 					<div class="row-fluid" >
                         <div class="searched white">
                             <div class="input-append" style="margin-top:15px; padding-left:10px;">
-                                <script type="text/x-handlebars"> 
+                           <!--      <script type="text/x-handlebars"> 
                                 {{view App.OrganisationSearchTextField placeholder="Organisation Name" valueBinding="App.organisationUserController.organisation" class="span8"}}
                                 <button class="btn btn-info" {{action "loadOrganisation" target="App.organisationUserController"}}>Go!</button>
-                                </script>
+                                </script> --> 
+                                <!-- Janani - Modified ember.js code of loadOrganisation to angular.js binding and method call -->
+                                Organisation Name: <input data-ng-model="orgName" type=text></input>
+                                <button data-ng-click="loadOrganisation()">Go!</button>
                             </div>
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">Organisation Members</p>
                             <ul class="unstyled recentSearches table-striped" style="max-height:171px; overflow:auto;"> 
-                                 <script type="text/x-handlebars"> 
+                            <!-- Janani - Display orgList and searchOrgUser method click using Angular.js -->
+                                <li data-ng-repeat="x in orgList | orderBy:'orgUsername':true"> 
+                                        <a href="#" title="view repos" data-ng-click="searchOrgUser(x)" data-ng-bind="x.orgUsername"></a>   
+                                    </li>  
+<!--                                  <script type="text/x-handlebars"> 
                                  {{#each App.organisationUserController}}
-                                    <li> 
+                                    
                                         <a href="#" title="view repos" {{action "searchOrgUser" target="App.organisationUserController"}}>{{orgUsername}}</a>
-                                    </li> 
+                                    
                                 {{/each}} 
-                                </script>
+                                </script> -->
+                               
                             </ul>
                         </div>  
                     </div>
@@ -248,75 +275,77 @@
                     <div class="row-fluid" style="position:relative;">
                         <div id="userData" class="searched white">
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">User Bio</p>
-                             <script type="text/x-handlebars"> 
-                            {{#each App.githubUserController}}
-                                <div class="row-fluid">
+                            <!-- Janani - Display UserBio details using Angular.js binding / Removed ember.js binding-->
+                           
+
+                       <!--      {{#each githubUserList}} -->
+                                <div class="row-fluid" data-ng-repeat="x in githubUserList">
                                     <div class="span12" style="padding-left:10px;padding-right:100px;">
-										{{#if name}}<p><strong>Name:</strong> {{name}}</p>{{/if}}
+										<p data-ng-if="name"><strong>Name:</strong> {{name}}</p>
                                         <p><strong>Username:</strong> {{username}}</p>
-                                        {{#if company}}<p><strong>Company:</strong> {{company}}</p>{{/if}}
+                                        <p><strong data-ng-if="company">Company:</strong> {{company}}</p>
                                         <p><strong>Repos:</strong> {{repos}}</p>
                                         <p><strong>Followers:</strong> {{followers}}</p>
                                         <p><strong>Joined on:</strong> {{joined}}</p>
                                     </div>
                                     
-                                        <img class="avatar img-polaroid" {{bindAttr src="avatar"}} />
+                                        <img class="avatar img-polaroid" src="{{avatar}}" />
                                     
                                 </div>
                                 <div class="row-fluid visible-phone phoneButtons">
                                     <div class="phone-button">
-                                        {{#if email}}
-											<a class="btn btn-primary btn-large" href="mailto:{{unbound email}}"><i class="icon-envelope-alt icon-4x"></i></a>
-										{{/if}}   
+                                    <!--      {{#if email}} -->
+											<a data-ng-if="email" class="btn btn-primary btn-large" href="mailto:{{unbound email}}"><i class="icon-envelope-alt icon-4x"></i></a>
+									<!--  	{{/if}}  --> 
                                     </div>
                                     <div class="phone-button">
-										 {{#if blog}}
-											<a class="btn btn-warning btn-large" href="{{unbound blog}}" target="_blank"><i class="icon-comments icon-4x"></i></a>
-										 {{/if}}   
+										 
+											<a data-ng-if="blog" class="btn btn-warning btn-large" href="{{unbound blog}}" target="_blank"><i class="icon-comments icon-4x"></i></a>
+										  
                                     </div>
                                     <div class="phone-button">
-                                        {{#if location}}
-											<a class="btn btn-danger btn-large" href="{{unbound location}}" target="_blank"><i class="icon-map-marker icon-4x"></i></a>
-										{{/if}}
+                                        
+											<a data-ng-if="location" class="btn btn-danger btn-large" href="{{unbound location}}" target="_blank"><i class="icon-map-marker icon-4x"></i></a>
+										
                                     </div>
                                     <div class="phone-button">
-										{{#if hireable}}
-												<a class="btn btn-inverse btn-large" href="{{unbound blog}}" target="_blank"><i class="icon-suitcase icon-4x"></i></a>
-										{{/if}}	
+									
+												<a data-ng-if="hireable" class="btn btn-inverse btn-large" href="{{unbound blog}}" target="_blank"><i class="icon-suitcase icon-4x"></i></a>
+									
                                     </div>
                                 </div>
 								<div class="row-fluid hidden-phone" style="position:absolute; margin-top:10px;overflow:hidden;">
-									{{#if email}}
-										<div class="span3">
+								
+										<div data-ng-if="email" class="span3">
 											<div class="ribbon emailTag" style="position:relative;">
 												<a href="mailto:{{unbound email}}"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Email</p><i class="icon-envelope-alt icon-2x"></i></span></a>
 											</div>
 										</div>
-									{{/if}}
-									{{#if blog}}
-										<div class="span3">
+								
+									
+										<div data-ng-if="blog" class="span3">
 											<div class="ribbon blogtag" style="position:relative;">
 												<a href="{{unbound blog}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Blog</p><i class="icon-comments icon-2x"></i></span></a>
 											</div>
 										</div>
-									{{/if}}
-									{{#if location}}
-										<div class="span3">
+								
+								
+										<div data-ng-if="location" class="span3">
 											<div class="ribbon localeTag" style="position:relative;">
 												<a href="{{unbound location}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Locale</p><i class="icon-map-marker icon-2x"></i></span></a>
 											</div>
 										</div>
-									{{/if}}
-									{{#if hireable}}
-										<div class="span3">
+									
+								
+										<div data-ng-if="hireable" class="span3">
 											<div class="ribbon hireTag" style="position:relative;">
 												<a href="{{unbound blog}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead"  style="color:#fff;">Hire</p><i class="icon-suitcase icon-2x"></i></span></a>
 											</div>
 										</div>
-									{{/if}}
+								
 								</div>	
-                            {{/each}} 
-                            </script>  
+
+                             
                         </div>
                     </div>
 					</div>
@@ -326,13 +355,14 @@
 					
                         <div id="results" class="white">
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;  margin-bottom:-1px;" class="lead blue">User Repositories</p>
+                         <!-- Janani - Display User Repository using Angular.js / Removed Ember.js binding
                              <script type="text/x-handlebars"> 
-                        {{#each App.reposController}}
-                            <div class="row-fluid">
+                        {{#each repoList}} -->   
+                            <div class="row-fluid" data-ng-repeat="x in repoList">
                                 <div class="repo"> 
                                     <div class="span12 repoDetails">
                                         <blockquote>
-                                            <h3 class="blue" style="margin-bottom:0px;"><a target="_blank" {{bindAttr href="repoUrl"}}>{{name}}</a></h3>
+                                            <h3 class="blue" style="margin-bottom:0px;"><a target="_blank" href="{{repoUrl}}">{{name}}</a></h3>
                                             <p><strong>Language:</strong> {{language}}</p>
                                             <p><strong>File Size:</strong> {{size}}kb</p>
                                             <p><strong>Description:</strong></p> 
@@ -344,18 +374,17 @@
                                             
                                             <small>Created on {{created}}</small>
                                         <div class="ribbonWrapper" style="overflow:hidden;">
-                                         <a target="_blank" {{bindAttr href="repoUrl"}}><img class="ribbon" src="images/fork.png" alt="Fork me on GitHub"></a>
+                                         <a target="_blank" href="{{repoUrl}}"><img class="ribbon" src="images/fork.png" alt="Fork me on GitHub"></a>
                                         </div>
                                         </blockquote>
                                     </div>
                                 </div>
                             </div>   
-                            {{/each}}
-                            </script>
+                           
                         </div>
                     </div>     
                 </div>    
-             </script>
+            
         </div>
     </div>
 
@@ -380,6 +409,7 @@
     <div class="footer gitber" style="position:fixed; bottom:0px; left:0px; background:#fff; height:40px; width:100%; text-align:center;">
 				<p>footer!</p>
 	</div>
+	</div>
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
         <![endif]-->
@@ -390,17 +420,12 @@
         <script src="scripts/vendor/base64.js"></script>
         <script src="scripts/vendor/jquery.fittext.js"></script>
         <script src="scripts/vendor/forkit.js"></script>
-        <script src="scripts/main.js"></script>
+        <!-- Janani - Moved all code from main.js to angularTest.js. Removing ember.js and incorporated Angularjs -->
+      <!--    <script src="scripts/main.js"></script> -->
+         <script src="scripts/angularTest.js"></script>
         <script src="scripts/vendor/skrollr.min.js"></script>
-        <script>
-        
-		$(function() {
-		$("#fitHeader").fitText(0.7);
-			skrollr.init({
-				forceHeight: false
-			});
-		});
-    </script>
+
+  
         <!--script src="scripts/routes/app-router.js"></script>
         <script src="scripts/store.js"></script>
         <script src="scripts/controllers/application-controller.js"></script>

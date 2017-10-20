@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>GitberAngular</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href='http://fonts.googleapis.com/css?family=Keania+One' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Roboto:400,900' rel='stylesheet' type='text/css'>
+</head>
+<body>
+  <app-root></app-root>
+
+  <div class="forkit-curtain">
+    <div class="close-button"></div>
+    <div class="container">
+        <div class="row-fluid">
+            <div class="span3">
+
+            </div>
+            <div class="span6">
+                <h1 class="blue">Information about GitBer goes here</h1>
+            </div>    
+        </div>   
+    </div>    
+</div>
+
+<!-- The ribbon -->
+<a class="forkit" data-text="About" data-text-detached="Drag down >" href="https://github.com/hakimel/forkit.js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://a248.e.akamai.net/camo.github.com/e6bef7a091f5f3138b8cd40bc3e114258dd68ddf/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub"></a>
+
+<div class="footer gitber" style="position:fixed; bottom:0px; left:0px; background:#fff; height:40px; width:100%; text-align:center;">
+    <p>footer!</p>
+</div>
+
+<!-- Load skrllr.js -->
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/js/jquery.fittext.js"></script>
+<script src="/assets/js/skrollr.min.js"></script>
+<script>
+  $(function() {
+    $("#fitHeader").fitText(0.7);
+    skrollr.init({
+      forceHeight: false
+    });
+  });
+</script>
+
+</body>
+</html>

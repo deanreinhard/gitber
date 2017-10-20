@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef  } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { GithubService } from './services/github.service';
 
@@ -18,7 +18,8 @@ export class AppComponent implements OnInit{
   organization = [];
 
   constructor(
-    private github: GithubService
+    private github: GithubService,
+    private elementRef:ElementRef
   ){
     this.searchUserForm = new FormGroup({      
       'username': new FormControl(name),
@@ -30,6 +31,25 @@ export class AppComponent implements OnInit{
 
   ngOnInit(){
         
+  }
+
+  // Load forkit.js
+  ngAfterViewInit() {
+    var forkitjs = document.createElement('script');
+    forkitjs.type = 'text/javascript';
+    forkitjs.src = '/assets/js/forkit.js';    
+    this.elementRef.nativeElement.appendChild(forkitjs);
+
+    var forkitcss = document.createElement('link');
+    forkitcss.type = 'text/css';
+    forkitcss.rel = 'stylesheet';
+    forkitcss.href = '/assets/css/forkit.css';    
+    this.elementRef.nativeElement.appendChild(forkitcss);
+
+    var jqueryMin = document.createElement('script');
+    jqueryMin.type = 'text/javascript';
+    jqueryMin.src = '/assets/js/jquery.min.js';    
+    this.elementRef.nativeElement.appendChild(jqueryMin);  
   }
 
   // Search user data and repositories

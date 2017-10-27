@@ -346,37 +346,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div id="results" class="white">
-                            <p style="padding:5px 10px; border-bottom:1px solid #ccc;  margin-bottom:-1px;" class="lead blue">User Repositories</p>
-                             <script type="text/x-handlebars"> 
-                        {{#each App.reposController}}
-                            <div class="row-fluid">
-                                <div class="repo"> 
-                                    <div class="span12 repoDetails">
-                                        <blockquote>
-                                            <h3 class="blue" style="margin-bottom:0px;"><a target="_blank" {{bindAttr href="repoUrl"}}>{{name}}</a></h3>
-                                            <p><strong>Language:</strong> {{language}}</p>
-                                            <p><strong>File Size:</strong> {{size}}kb</p>
-                                            <p><strong>Description:</strong></p> 
-											<div class="row-fluid">
-												<div class="span10">
-													<pre>{{readme}}</pre>
-												</div>
-											</div>	
-                                            
-                                            <small>Created on {{created}}</small>
-                                        <div class="ribbonWrapper" style="overflow:hidden;">
-                                         <a target="_blank" {{bindAttr href="repoUrl"}}><img class="ribbon" src="images/fork.png" alt="Fork me on GitHub"></a>
-                                        </div>
-                                        </blockquote>
-                                    </div>
-                                </div>
-                            </div>   
-                            {{/each}}
-                            </script>
-                        </div>
-                    </div>     
-                </div>    
+                    </div>
+                </div>
              </script>
         </div>
     </div>

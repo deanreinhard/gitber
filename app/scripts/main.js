@@ -39,13 +39,13 @@ var githubService = {
 };
 
 /**************************
-* Application
-**************************/
+ * Application
+ **************************/
 var App = angular.module('gitberApp', []);
 
 /**************************
-* Models
-**************************/
+ * Models
+ **************************/
 App.factory('githubUser', function($http, recentSearches, githubRepos, githubUserForm) {
     var User = {};
 
@@ -160,6 +160,8 @@ App.factory('recentSearches', function() {
 });
 
 App.factory('githubUserForm', function() {
+    // Need to create service as an object to keep reference to Username
+    // property. Otherwise angular will not be able to store changes
     var svc = {};
     svc.Username = '';
 
@@ -170,19 +172,13 @@ App.factory('githubUserForm', function() {
     return svc;
 });
 
-
 /**************************
-* Views
-**************************/
-
-/**************************
-* Controllers
-**************************/
-App.controller('userSearchCtrl', function($rootScope, $scope, githubUserForm, githubUser, recentSearches) {
+ * Controllers
+ **************************/
+App.controller('userSearchCtrl', function($scope, githubUserForm, githubUser) {
     $scope.username = githubUserForm.Username;
-    $scope.history = recentSearches.Searches;
 
-    $scope.searchUser = function(e) {
+    $scope.searchUser = function (e) {
         githubUser.searchUser($scope.username);
 
         // Prevent Form Submission
@@ -192,16 +188,19 @@ App.controller('userSearchCtrl', function($rootScope, $scope, githubUserForm, gi
     // Watch githubUserForm.Username for changes so that we can
     // update $scope.username when search is toggled externally
     $scope.$watch(
-        function(){
+        function () {
             return githubUserForm.Username;
         },
-        function(newVal) {
-            if($scope.username !== newVal) {
-                $scope.username = newVal ;
+        function (newVal) {
+            if ($scope.username !== newVal) {
+                $scope.username = newVal;
             }
         },
         true);
+});
 
+App.controller('recentSearchesCtrl', function($scope, githubUser, recentSearches) {
+    $scope.searches = recentSearches.Searches;
     $scope.searchAgain = githubUser.searchUser;
     $scope.removeUser = recentSearches.removeUser;
 });

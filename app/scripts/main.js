@@ -26,37 +26,18 @@ var API = {
     }
 };
 
-var githubService = {
-    repos: function(username) {
-
-    },
-    repoReadme: function(username, repo) {
-
-    },
-    orgMembers: function(organisation) {
-
-    }
-};
-
 /**************************
  * Application
  **************************/
 var App = angular.module('gitberApp', []);
 
 /**************************
- * Models
+ * API Service
  **************************/
-App.factory('githubUser', function($http, recentSearches, githubRepos, githubUserForm) {
-    var User = {};
 
-    function searchUser(username) {
-        // Stop search if username is blank
-        if(username.length === 0) return;
-
-        // Set githubUserForm username field if toggled by a link
-        githubUserForm.setUsername(username);
-
-        $http.get(API.user(username)).then(function(response){
+App.factory('githubApi', function($http) {
+    function user(username) {
+        return $http.get(API.user(username)).then(function(response) {
             var value = response.data;
             var user = {
                 username: value.login,
@@ -72,6 +53,78 @@ App.factory('githubUser', function($http, recentSearches, githubRepos, githubUse
                 followers: value.followers,
                 joined: value.created_at
             };
+            return user;
+        });
+    }
+
+    function repos(username) {
+        return $http.get(API.repos(username)).then(function(response) {
+            return new Promise(function(resolve) {
+                async.map(
+                    response.data,
+                    function (value, callback) {
+                        var repo = {
+                            name: value.name,
+                            created: value.created_at,
+                            repoUrl: value.clone_url,
+                            language: value.language,
+                            size: value.size,
+                            avatar: value.owner.avatar_url,
+                            owner: value.owner.login,
+                            readme: 'No readme found'
+                        };
+                        $http.get(API.readme(username, repo.name)).then(
+                            function(response){
+                                repo.readme = $.base64Decode(response.data.content);
+                                callback(null, repo)
+                            },
+                            function() {
+                                repo.readme = 'No readme found';
+                                callback(null, repo);
+                            }
+                        );
+                    },
+                    function (error, repos) {
+                        resolve(repos);
+                    });
+            });
+        });
+    }
+
+    function organisation(organisation) {
+        return $http.get(API.organisation(organisation)).then(function(response) {
+            var members  = [];
+            for(var i = 0; i < response.data.length; i++) {
+                var value = response.data[i];
+                members.push({
+                    username: value.login
+                });
+            }
+            return members;
+        });
+    }
+
+    return {
+        user: user,
+        repos: repos,
+        organisation: organisation
+    };
+});
+
+/**************************
+ * Models
+ **************************/
+App.factory('githubUser', function(githubApi, recentSearches, githubRepos, githubUserForm) {
+    var User = {};
+
+    function searchUser(username) {
+        // Stop search if username is blank
+        if(username.length === 0) return;
+
+        // Set githubUserForm username field if toggled by a link
+        githubUserForm.setUsername(username);
+
+        githubApi.user(username).then(function(user) {
             angular.extend(User, user);
             recentSearches.addUser(username);
             githubRepos.getRepos(username);
@@ -84,39 +137,12 @@ App.factory('githubUser', function($http, recentSearches, githubRepos, githubUse
     };
 });
 
-App.factory('githubRepos', function($http) {
+App.factory('githubRepos', function(githubApi) {
     var Repos = [];
 
     function getRepos(username) {
-        $http.get(API.repos(username)).then(function(response) {
-            repos  = [];
-            async.map(
-                response.data,
-                function (value, callback) {
-                    var repo = {
-                        name: value.name,
-                        created: value.created_at,
-                        repoUrl: value.clone_url,
-                        language: value.language,
-                        size: value.size,
-                        avatar: value.owner.avatar_url,
-                        owner: value.owner.login,
-                        readme: 'No readme found'
-                    };
-                    $http.get(API.readme(username, repo.name)).then(
-                        function(response){
-                            repo.readme = $.base64Decode(response.data.content);
-                            callback(null, repo)
-                        },
-                        function() {
-                            repo.readme = 'No readme found';
-                            callback(null, repo);
-                        }
-                    );
-                },
-                function (error, repos) {
-                    angular.copy(repos, Repos);
-                });
+        githubApi.repos(username).then(function (repos) {
+            angular.copy(repos, Repos);
         });
     }
 
@@ -126,18 +152,11 @@ App.factory('githubRepos', function($http) {
     };
 });
 
-App.factory('githubOrganisation', function($http) {
+App.factory('githubOrganisation', function(githubApi) {
     var Members = [];
 
     function getOrganisation(organisation) {
-        $http.get(API.organisation(organisation)).then(function(response) {
-            var members  = [];
-            for(var i = 0; i < response.data.length; i++) {
-                var value = response.data[i];
-                members.push({
-                    username: value.login
-                });
-            }
+        githubApi.organisation(organisation).then(function(members) {
             angular.copy(members, Members);
         });
     }

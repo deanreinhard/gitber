@@ -81,14 +81,11 @@ App.reposController = Em.ArrayController.create({
 						success = true;
 						repo.readmeFile = $.base64Decode(readme.content);
                       callback(null, repo);
+                    })
+                    .fail(function(){
+                        repo.readmeFile = "No readme found";
+                        callback(null, repo);
                     });
-					setTimeout(function() {
-						if (!success)
-						{
-								repo.readmeFile = "No readme found";
-								callback(null, repo);
-						}
-					}, 2200);
                   },
                   function(error, reposWithReadme){
                     $(reposWithReadme).each(function(index,value){

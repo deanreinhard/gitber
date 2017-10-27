@@ -27,25 +27,6 @@ var API = {
 };
 
 var githubService = {
-    user: function(username, callback) {
-        $.getJSON(API.user(username), function(value){
-            var githubUser = {
-                username: value.login,
-                avatar: value.avatar_url,
-                name: value.name,
-                company: value.company,
-                blog: value.blog,
-                location: value.location,
-                email: value.email,
-                hireable: value.hireable,
-                bio: value.bio,
-                repos: value.public_repos,
-                followers: value.followers,
-                joined: value.created_at
-            };
-            callback(githubUser);
-        });
-    },
     repos: function(username) {
 
     },
@@ -72,8 +53,22 @@ App.factory('githubUser', function($http, recentSearches) {
         // Stop search if username is blank
         if(username.length === 0) return;
 
-        $http.get(API.user(username)).then(function(response){
-            User = response;
+        $http.get(API.user(username)).then(function(value){
+            var user = {
+                username: value.login,
+                avatar: value.avatar_url,
+                name: value.name,
+                company: value.company,
+                blog: value.blog,
+                location: value.location,
+                email: value.email,
+                hireable: value.hireable,
+                bio: value.bio,
+                repos: value.public_repos,
+                followers: value.followers,
+                joined: value.created_at
+            };
+            User = user;
             recentSearches.addUser(username);
         });
     }

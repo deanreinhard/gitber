@@ -74,36 +74,36 @@ App.reposController = Em.ArrayController.create({
             $.getJSON(API.repos(username),function(data){
                 me.set('content', []);
                 async.map(
-                  data,
-                  function(repo, callback){
-				  var success = false;
-                    $.getJSON(API.readme(username, repo.name), function(readme){
-						success = true;
-						repo.readmeFile = $.base64Decode(readme.content);
-                      callback(null, repo);
-                    })
-                    .fail(function(){
-                        repo.readmeFile = "No readme found";
-                        callback(null, repo);
+                    data,
+                    function(repo, callback){
+                        var success = false;
+                        $.getJSON(API.readme(username, repo.name), function(readme){
+                            success = true;
+                            repo.readmeFile = $.base64Decode(readme.content);
+                            callback(null, repo);
+                        })
+                            .fail(function(){
+                                repo.readmeFile = "No readme found";
+                                callback(null, repo);
+                            });
+                    },
+                    function(error, reposWithReadme){
+                        $(reposWithReadme).each(function(index,value){
+                            var repoArray = App.repo.create({
+                                name: value.name,
+                                created: value.created_at,
+                                repoUrl: value.clone_url,
+                                language: value.language,
+                                size: value.size,
+                                avatar: value.owner.avatar_url,
+                                owner: value.owner.login,
+                                readme: value.readmeFile
+                            });
+                            me.pushObject(repoArray);
+                        });
                     });
-                  },
-                  function(error, reposWithReadme){
-                    $(reposWithReadme).each(function(index,value){
-                      var repoArray = App.repo.create({
-                          name: value.name,
-                          created: value.created_at,
-                          repoUrl: value.clone_url,
-                          language: value.language,
-                          size: value.size,
-                          avatar: value.owner.avatar_url,
-                          owner: value.owner.login,
-                          readme: value.readmeFile
-                      });
-                      me.pushObject(repoArray);
-                  });
-                });
             });
-        App.githubUserController.loadUser(username);
+            App.githubUserController.loadUser(username);
         }
     }
 });
@@ -165,13 +165,9 @@ App.organisationUserController = Em.ArrayController.create({
     }
 });
 
-
-
- function formatJoinDate(joined) {
-        var joined = Date.parse(joined);
-        return joined.toString("d MMMM yyyy");
-    };
-
+function formatJoinDate(joined) {
+    return Date.parse(joined).toString("d MMMM yyyy");
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////
 App.recentUsersController = Em.ArrayController.create({

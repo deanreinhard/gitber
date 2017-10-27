@@ -211,7 +211,7 @@
                             </div>
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">Recent Searches</p>
                             <ul class="unstyled recentSearches table-striped">
-                                <li ng-repeat="username in history.data | reverse">
+                                <li ng-repeat="username in history | reverse">
                                     <a ng-click="searchAgain(username)" href="#" title="view again">{{ username }}</a>
                                     <a ng-click="removeUser(username)" class="btn btn-info btn-mini pull-right" href="#" title="remove">X</a>
                                 </li>
@@ -304,7 +304,7 @@
                     <div class="row-fluid">
                         <div ng-controller="reposCtrl" id="results" class="white">
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;  margin-bottom:-1px;" class="lead blue">User Repositories</p>
-                            <div ng-repeat="repo in repos.data" class="row-fluid">
+                            <div ng-repeat="repo in repos" class="row-fluid">
                                 <div class="repo">
                                     <div class="span12 repoDetails">
                                         <blockquote>

@@ -82,17 +82,14 @@ App.factory('githubUser', function($http, recentSearches, githubRepos) {
 });
 
 App.factory('githubRepos', function($http) {
-    // data property is used to preserve reference when emptying the list
-    // otherwise it may cause Angular to not watch the array correctly
-    // i.e. Repos.data = []
-    var Repos = {data: []};
+    var Repos = [];
 
     function getRepos(username) {
         $http.get(API.repos(username)).then(function(response) {
-            Repos.data  = [];
+            repos  = [];
             for(var i = 0; i < response.data.length; i++) {
                 var value = response.data[i];
-                Repos.data.push({
+                repos.push({
                     name: value.name,
                     created: value.created_at,
                     repoUrl: value.clone_url,
@@ -103,6 +100,7 @@ App.factory('githubRepos', function($http) {
                     readme: 'No readme found'
                 });
             }
+            angular.copy(repos, Repos);
         });
     }
 
@@ -113,22 +111,19 @@ App.factory('githubRepos', function($http) {
 });
 
 App.factory('recentSearches', function() {
-    // data property is used to preserve reference when emptying the list
-    // otherwise it may cause Angular to not watch the array correctly
-    // i.e. Searches.data = []
-    var Searches = {data: []};
+    var Searches = [];
 
     function addUser(username) {
-        if(Searches.data.indexOf(username) !== -1) {
+        if(Searches.indexOf(username) !== -1) {
             removeUser(username);
         }
-        Searches.data.push(username);
+        Searches.push(username);
     }
 
     function removeUser(username) {
-        var index = Searches.data.indexOf(username);
+        var index = Searches.indexOf(username);
         if (index !== -1) {
-            Searches.data.splice(index, 1);
+            Searches.splice(index, 1);
         }
     }
 

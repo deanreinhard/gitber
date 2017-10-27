@@ -65,7 +65,7 @@ App.OrganisationSearchTextField = Em.TextField.extend({
 App.reposController = Em.ArrayController.create({
     content: [],
     username: '',
-    loadrepos: function(username,name) {
+    loadrepos: function() {
         var me = this;
         var username = me.get("username");
         if ( username ) {
@@ -110,7 +110,7 @@ App.reposController = Em.ArrayController.create({
 
 App.githubUserController = Em.ArrayController.create({
     content: [],
-    loadUser: function(username,name) {
+    loadUser: function(username) {
         var me = this;
         if ( username ) {
             // push username to recent user array
@@ -143,7 +143,7 @@ App.githubUserController = Em.ArrayController.create({
 App.organisationUserController = Em.ArrayController.create({
 	organisation: '',
     content: [],
-    loadOrganisation: function(organisation,name) {
+    loadOrganisation: function() {
         var me = this;
 		var organisation = me.get("organisation");
         if ( organisation ) {

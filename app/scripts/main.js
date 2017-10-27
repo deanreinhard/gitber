@@ -46,7 +46,7 @@ var App = angular.module('gitberApp', []);
 /**************************
 * Models
 **************************/
-App.factory('githubUser', function($http, recentSearches) {
+App.factory('githubUser', function($http, recentSearches, githubRepos) {
     var User = {};
 
     function searchUser(username) {
@@ -70,12 +70,41 @@ App.factory('githubUser', function($http, recentSearches) {
             };
             User = user;
             recentSearches.addUser(username);
+            githubRepos.getRepos(username);
         });
     }
 
     return {
         User: User,
         searchUser: searchUser
+    };
+});
+
+App.factory('githubRepos', function($http) {
+    var Repo = {repos: []};
+
+    function getRepos(username) {
+        $http.get(API.repos(username)).then(function(response) {
+            Repo.repos = [];
+            for(var i = 0; i < response.data.length; i++) {
+                var value = response.data[i];
+                Repo.repos.push({
+                    name: value.name,
+                    created: value.created_at,
+                    repoUrl: value.clone_url,
+                    language: value.language,
+                    size: value.size,
+                    avatar: value.owner.avatar_url,
+                    owner: value.owner.login,
+                    readme: 'No readme found'
+                });
+            }
+        });
+    }
+
+    return {
+        Repo: Repo,
+        getRepos: getRepos
     };
 });
 
@@ -132,6 +161,10 @@ App.controller('userSearchCtrl', function($rootScope, $scope, githubUser, recent
 
 App.controller('orgSearchCtrl', function($rootScope, $scope) {
 
+});
+
+App.controller('reposCtrl', function($scope, githubRepos) {
+    $scope.repo = githubRepos.Repo;
 });
 
 /**************************

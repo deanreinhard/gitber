@@ -81,14 +81,17 @@ App.factory('githubUser', function($http, recentSearches, githubRepos) {
 });
 
 App.factory('githubRepos', function($http) {
-    var Repo = {repos: []};
+    // data property is used to preserve reference when emptying the list
+    // otherwise it may cause Angular to not watch the array correctly
+    // i.e. Repos.data = []
+    var Repos = {data: []};
 
     function getRepos(username) {
         $http.get(API.repos(username)).then(function(response) {
-            Repo.repos = [];
+            Repos.data  = [];
             for(var i = 0; i < response.data.length; i++) {
                 var value = response.data[i];
-                Repo.repos.push({
+                Repos.data.push({
                     name: value.name,
                     created: value.created_at,
                     repoUrl: value.clone_url,
@@ -103,25 +106,28 @@ App.factory('githubRepos', function($http) {
     }
 
     return {
-        Repo: Repo,
+        Repos: Repos,
         getRepos: getRepos
     };
 });
 
 App.factory('recentSearches', function() {
-    var Searches = [];
+    // data property is used to preserve reference when emptying the list
+    // otherwise it may cause Angular to not watch the array correctly
+    // i.e. Searches.data = []
+    var Searches = {data: []};
 
     function addUser(username) {
-        if(Searches.indexOf(username) !== -1) {
+        if(Searches.data.indexOf(username) !== -1) {
             removeUser(username);
         }
-        Searches.push(username);
+        Searches.data.push(username);
     }
 
     function removeUser(username) {
-        var index = Searches.indexOf(username);
+        var index = Searches.data.indexOf(username);
         if (index !== -1) {
-            Searches.splice(index, 1);
+            Searches.data.splice(index, 1);
         }
     }
 
@@ -164,7 +170,7 @@ App.controller('orgSearchCtrl', function($rootScope, $scope) {
 });
 
 App.controller('reposCtrl', function($scope, githubRepos) {
-    $scope.repo = githubRepos.Repo;
+    $scope.repos = githubRepos.Repos;
 });
 
 /**************************

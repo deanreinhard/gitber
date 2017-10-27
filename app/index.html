@@ -244,80 +244,61 @@
 					
 					
                     <div class="row-fluid" style="position:relative;">
-                        <div id="userData" class="searched white">
+                        <div ng-controller="userBioCtrl" id="userData" class="searched white">
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">User Bio</p>
-                             <script type="text/x-handlebars"> 
-                            {{#each App.githubUserController}}
-                                <div class="row-fluid">
-                                    <div class="span12" style="padding-left:10px;padding-right:100px;">
-										{{#if name}}<p><strong>Name:</strong> {{name}}</p>{{/if}}
-                                        <p><strong>Username:</strong> {{username}}</p>
-                                        {{#if company}}<p><strong>Company:</strong> {{company}}</p>{{/if}}
-                                        <p><strong>Repos:</strong> {{repos}}</p>
-                                        <p><strong>Followers:</strong> {{followers}}</p>
-                                        <p><strong>Joined on:</strong> {{joined}}</p>
-                                    </div>
-                                    
-                                        <img class="avatar img-polaroid" {{bindAttr src="avatar"}} />
-                                    
+                            <div ng-if="user.username" class="row-fluid">
+                                <div class="span12" style="padding-left:10px;padding-right:100px;">
+                                    <p ng-if="user.name"><strong>Name:</strong> {{user.name}}</p>
+                                    <p><strong>Username:</strong> {{user.username}}</p>
+                                    <p ng-if="user.company"><strong>Company:</strong> {{user.company}}</p>
+                                    <p><strong>Repos:</strong> {{user.repos}}</p>
+                                    <p><strong>Followers:</strong> {{user.followers}}</p>
+                                    <p><strong>Joined on:</strong> {{user.joined}}</p>
                                 </div>
-                                <div class="row-fluid visible-phone phoneButtons">
-                                    <div class="phone-button">
-                                        {{#if email}}
-											<a class="btn btn-primary btn-large" href="mailto:{{unbound email}}"><i class="icon-envelope-alt icon-4x"></i></a>
-										{{/if}}   
-                                    </div>
-                                    <div class="phone-button">
-										 {{#if blog}}
-											<a class="btn btn-warning btn-large" href="{{unbound blog}}" target="_blank"><i class="icon-comments icon-4x"></i></a>
-										 {{/if}}   
-                                    </div>
-                                    <div class="phone-button">
-                                        {{#if location}}
-											<a class="btn btn-danger btn-large" href="{{unbound location}}" target="_blank"><i class="icon-map-marker icon-4x"></i></a>
-										{{/if}}
-                                    </div>
-                                    <div class="phone-button">
-										{{#if hireable}}
-												<a class="btn btn-inverse btn-large" href="{{unbound blog}}" target="_blank"><i class="icon-suitcase icon-4x"></i></a>
-										{{/if}}	
+
+                                <img class="avatar img-polaroid" ng-src="{{user.avatar}}" />
+
+                            </div>
+                            <div class="row-fluid visible-phone phoneButtons">
+                                <div ng-if="user.email" class="phone-button">
+                                    <a class="btn btn-primary btn-large" ng-href="mailto:{{user.email}}"><i class="icon-envelope-alt icon-4x"></i></a>
+                                </div>
+                                <div ng-if="user.blog" class="phone-button">
+                                    <a class="btn btn-warning btn-large" ng-href="{{user.blog}}" target="_blank"><i class="icon-comments icon-4x"></i></a>
+                                </div>
+                                <div ng-if="user.location" class="phone-button">
+                                    <a class="btn btn-danger btn-large" ng-href="https://www.google.com/maps/search/{{user.location}}" target="_blank"><i class="icon-map-marker icon-4x"></i></a>
+                                </div>
+                                <div ng-if="user.hireable" class="phone-button">
+                                    <a class="btn btn-inverse btn-large" ng-href="{{user.blog}}" target="_blank"><i class="icon-suitcase icon-4x"></i></a>
+                                </div>
+                            </div>
+
+                            <div class="row-fluid hidden-phone" style="position:absolute; margin-top:10px;overflow:hidden;">
+                                <div ng-if="user.email" class="span3">
+                                    <div class="ribbon emailTag" style="position:relative;">
+                                        <a ng-href="mailto:{{user.email}}"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Email</p><i class="icon-envelope-alt icon-2x"></i></span></a>
                                     </div>
                                 </div>
-								<div class="row-fluid hidden-phone" style="position:absolute; margin-top:10px;overflow:hidden;">
-									{{#if email}}
-										<div class="span3">
-											<div class="ribbon emailTag" style="position:relative;">
-												<a href="mailto:{{unbound email}}"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Email</p><i class="icon-envelope-alt icon-2x"></i></span></a>
-											</div>
-										</div>
-									{{/if}}
-									{{#if blog}}
-										<div class="span3">
-											<div class="ribbon blogtag" style="position:relative;">
-												<a href="{{unbound blog}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Blog</p><i class="icon-comments icon-2x"></i></span></a>
-											</div>
-										</div>
-									{{/if}}
-									{{#if location}}
-										<div class="span3">
-											<div class="ribbon localeTag" style="position:relative;">
-												<a href="{{unbound location}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Locale</p><i class="icon-map-marker icon-2x"></i></span></a>
-											</div>
-										</div>
-									{{/if}}
-									{{#if hireable}}
-										<div class="span3">
-											<div class="ribbon hireTag" style="position:relative;">
-												<a href="{{unbound blog}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead"  style="color:#fff;">Hire</p><i class="icon-suitcase icon-2x"></i></span></a>
-											</div>
-										</div>
-									{{/if}}
-								</div>	
-                            {{/each}} 
-                            </script>  
+                                <div ng-if="user.blog" class="span3">
+                                    <div class="ribbon blogtag" style="position:relative;">
+                                        <a ng-href="{{user.blog}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Blog</p><i class="icon-comments icon-2x"></i></span></a>
+                                    </div>
+                                </div>
+                                <div ng-if="user.location" class="span3">
+                                    <div class="ribbon localeTag" style="position:relative;">
+                                        <a ng-href="https://www.google.com/maps/search/{{user.location}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Locale</p><i class="icon-map-marker icon-2x"></i></span></a>
+                                    </div>
+                                </div>
+                                <div ng-if="user.hireable" class="span3">
+                                    <div class="ribbon hireTag" style="position:relative;">
+                                        <a ng-href="{{user.blog}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead"  style="color:#fff;">Hire</p><i class="icon-suitcase icon-2x"></i></span></a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-					</div>
+                </div>
                 </div>
                 <div class="span8">
                     <div class="row-fluid">

@@ -53,7 +53,8 @@ App.factory('githubUser', function($http, recentSearches, githubRepos) {
         // Stop search if username is blank
         if(username.length === 0) return;
 
-        $http.get(API.user(username)).then(function(value){
+        $http.get(API.user(username)).then(function(response){
+            var value = response.data;
             var user = {
                 username: value.login,
                 avatar: value.avatar_url,
@@ -68,7 +69,7 @@ App.factory('githubUser', function($http, recentSearches, githubRepos) {
                 followers: value.followers,
                 joined: value.created_at
             };
-            User = user;
+            angular.extend(User, user);
             recentSearches.addUser(username);
             githubRepos.getRepos(username);
         });
@@ -171,6 +172,10 @@ App.controller('orgSearchCtrl', function($rootScope, $scope) {
 
 App.controller('reposCtrl', function($scope, githubRepos) {
     $scope.repos = githubRepos.Repos;
+});
+
+App.controller('userBioCtrl', function($scope, githubUser) {
+    $scope.user = githubUser.User;
 });
 
 /**************************

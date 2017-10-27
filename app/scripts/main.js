@@ -1,4 +1,32 @@
 /**************************
+ * Constants
+ **************************/
+
+var CLIENT_KEY = '69af424226e15a6396dd';
+var SECRET_KEY = '683d05837403207f247939ab21668065352b65db';
+var OAUTH_QUERY_STRING = '?client_id=' + CLIENT_KEY + '&client_secret=' + SECRET_KEY;
+var API_URL = 'https://api.github.com';
+
+/**************************
+ * API
+ **************************/
+
+var API = {
+    user: function(username) {
+        return [API_URL, 'users', username].join('/') + OAUTH_QUERY_STRING;
+    },
+    repos: function(username) {
+        return [API_URL, 'users', username, 'repos'].join('/') + OAUTH_QUERY_STRING;
+    },
+    readme: function(username, repo) {
+        return [API_URL, 'repos', username, repo, 'readme'].join('/') + OAUTH_QUERY_STRING;
+    },
+    organisation: function(organisation) {
+        return [API_URL, 'orgs', organisation, 'members'].join('/') + OAUTH_QUERY_STRING;
+    }
+};
+
+/**************************
 * Application
 **************************/
 App = Em.Application.create();
@@ -31,9 +59,6 @@ App.OrganisationSearchTextField = Em.TextField.extend({
         App.organisationUserController.loadOrganisation();
     }
 });
-var client='69af424226e15a6396dd';
-var secret='683d05837403207f247939ab21668065352b65db';
-var oauth = '?client_id='+client+'&client_secret='+secret;
 /**************************
 * Controllers
 **************************/
@@ -44,17 +69,15 @@ App.reposController = Em.ArrayController.create({
         var me = this;
         var username = me.get("username");
         if ( username ) {
-            var url = 'https://api.github.com/users/'+username+'/repos'+oauth;
             App.recentUsersController.addUser(username);
             me.set('content', []);
-            $.getJSON(url,function(data){
+            $.getJSON(API.repos(username),function(data){
                 me.set('content', []);
                 async.map(
                   data,
                   function(repo, callback){
 				  var success = false;
-                    var url = 'https://api.github.com/repos/'+username+'/'+repo.name+'/readme'+oauth;
-                    $.getJSON(url, function(readme){
+                    $.getJSON(API.readme(username, repo.name), function(readme){
 						success = true;
 						repo.readmeFile = $.base64Decode(readme.content);
                       callback(null, repo);
@@ -93,10 +116,9 @@ App.githubUserController = Em.ArrayController.create({
     loadUser: function(username,name) {
         var me = this;
         if ( username ) {
-            var url = 'https://api.github.com/users/'+username+''+oauth;
             // push username to recent user array
             me.set('content', []);
-            $.getJSON(url,function(data){
+            $.getJSON(API.user(username),function(data){
                 me.set('content', []);
                 $(data).each(function(index,value){
                     var githubUserArray = App.githubUser.create({
@@ -128,9 +150,8 @@ App.organisationUserController = Em.ArrayController.create({
         var me = this;
 		var organisation = me.get("organisation");
         if ( organisation ) {
-            var url = 'https://api.github.com/orgs/'+organisation+'/members'+oauth;
             me.set('content', []);
-            $.getJSON(url,function(data){
+            $.getJSON(API.organisation(organisation),function(data){
                 me.set('content', []);
                 $(data).each(function(index,value){
                     var organisationUserArray = App.githubUser.create({

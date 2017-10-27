@@ -46,12 +46,15 @@ var App = angular.module('gitberApp', []);
 /**************************
 * Models
 **************************/
-App.factory('githubUser', function($http, recentSearches, githubRepos) {
+App.factory('githubUser', function($http, recentSearches, githubRepos, githubUserForm) {
     var User = {};
 
     function searchUser(username) {
         // Stop search if username is blank
         if(username.length === 0) return;
+
+        // Set githubUserForm username field if toggled by a link
+        githubUserForm.setUsername(username);
 
         $http.get(API.user(username)).then(function(response){
             var value = response.data;
@@ -110,6 +113,28 @@ App.factory('githubRepos', function($http) {
     };
 });
 
+App.factory('githubOrganisation', function($http) {
+    var Members = [];
+
+    function getOrganisation(organisation) {
+        $http.get(API.organisation(organisation)).then(function(response) {
+            var members  = [];
+            for(var i = 0; i < response.data.length; i++) {
+                var value = response.data[i];
+                members.push({
+                    username: value.login
+                });
+            }
+            angular.copy(members, Members);
+        });
+    }
+
+    return {
+        Members: Members,
+        getOrganisation: getOrganisation
+    };
+});
+
 App.factory('recentSearches', function() {
     var Searches = [];
 
@@ -134,6 +159,17 @@ App.factory('recentSearches', function() {
     };
 });
 
+App.factory('githubUserForm', function() {
+    var svc = {};
+    svc.Username = '';
+
+    svc.setUsername = function(username) {
+        svc.Username = username;
+    };
+
+    return svc;
+});
+
 
 /**************************
 * Views
@@ -142,27 +178,46 @@ App.factory('recentSearches', function() {
 /**************************
 * Controllers
 **************************/
-App.controller('userSearchCtrl', function($rootScope, $scope, githubUser, recentSearches) {
-    $scope.username = '';
+App.controller('userSearchCtrl', function($rootScope, $scope, githubUserForm, githubUser, recentSearches) {
+    $scope.username = githubUserForm.Username;
     $scope.history = recentSearches.Searches;
 
-    $scope.loadUser = function(e) {
+    $scope.searchUser = function(e) {
         githubUser.searchUser($scope.username);
 
         // Prevent Form Submission
         e.preventDefault();
     };
 
-    $scope.searchAgain = function(username) {
-        $scope.username = username;
-        githubUser.searchUser(username);
-    };
+    // Watch githubUserForm.Username for changes so that we can
+    // update $scope.username when search is toggled externally
+    $scope.$watch(
+        function(){
+            return githubUserForm.Username;
+        },
+        function(newVal) {
+            if($scope.username !== newVal) {
+                $scope.username = newVal ;
+            }
+        },
+        true);
 
+    $scope.searchAgain = githubUser.searchUser;
     $scope.removeUser = recentSearches.removeUser;
 });
 
-App.controller('orgSearchCtrl', function($rootScope, $scope) {
+App.controller('orgSearchCtrl', function($scope, githubOrganisation, githubUserForm, githubUser) {
+    $scope.organisation = '';
+    $scope.members = githubOrganisation.Members;
 
+    $scope.searchOrganisation = function(e) {
+        githubOrganisation.getOrganisation($scope.organisation);
+
+        // Prevent Form Submission
+        e.preventDefault();
+    };
+
+    $scope.searchUser = githubUser.searchUser;
 });
 
 App.controller('reposCtrl', function($scope, githubRepos) {

@@ -204,7 +204,7 @@
                     <div class="row-fluid" >
                         <div ng-controller="userSearchCtrl" class="searched white">
                             <div class="input-append" style="margin-top:15px; padding-left:10px;">
-                                <form ng-submit="loadUser($event)">
+                                <form ng-submit="searchUser($event)">
                                     <input type="text" placeholder="Github username" class="span8" ng-model="username">
                                     <button class="btn btn-info" type="submit">Go!</button>
                                 </form>
@@ -218,31 +218,27 @@
                             </ul>
                         </div>
                     </div>
-					
+
 					<div class="row-fluid" >
-                        <div class="searched white">
+                        <div ng-controller="orgSearchCtrl" class="searched white">
                             <div class="input-append" style="margin-top:15px; padding-left:10px;">
-                                <script type="text/x-handlebars"> 
-                                {{view App.OrganisationSearchTextField placeholder="Organisation Name" valueBinding="App.organisationUserController.organisation" class="span8"}}
-                                <button class="btn btn-info" {{action "loadOrganisation" target="App.organisationUserController"}}>Go!</button>
-                                </script>
+                                <form ng-submit="searchOrganisation($event)">
+                                    <input type="text" placeholder="Organisation Name" class="span8" ng-model="organisation">
+                                    <button class="btn btn-info" type="submit">Go!</button>
+                                </form>
                             </div>
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">Organisation Members</p>
-                            <ul class="unstyled recentSearches table-striped" style="max-height:171px; overflow:auto;"> 
-                                 <script type="text/x-handlebars"> 
-                                 {{#each App.organisationUserController}}
-                                    <li> 
-                                        <a href="#" title="view repos" {{action "searchOrgUser" target="App.organisationUserController"}}>{{orgUsername}}</a>
-                                    </li> 
-                                {{/each}} 
-                                </script>
+                            <ul class="unstyled recentSearches table-striped" style="max-height:171px; overflow:auto;">
+                                <li ng-repeat="member in members">
+                                    <a ng-click="searchUser(member.username)" href="#" title="view repos">{{member.username}}</a>
+                                </li>
                             </ul>
-                        </div>  
+                        </div>
                     </div>
-					
-					
-					
-					
+
+
+
+
                     <div class="row-fluid" style="position:relative;">
                         <div ng-controller="userBioCtrl" id="userData" class="searched white">
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">User Bio</p>

@@ -308,7 +308,7 @@
                                 <div class="repo">
                                     <div class="span12 repoDetails">
                                         <blockquote>
-                                            <h3 class="blue" style="margin-bottom:0px;"><a target="_blank" {{bindAttr href="repoUrl"}}>{{repo.name}}</a></h3>
+                                            <h3 class="blue" style="margin-bottom:0px;"><a target="_blank" ng-href="{{repo.repoUrl}}">{{repo.name}}</a></h3>
                                             <p><strong>Language:</strong> {{repo.language}}</p>
                                             <p><strong>File Size:</strong> {{repo.size}}kb</p>
                                             <p><strong>Description:</strong></p>
@@ -320,7 +320,7 @@
 
                                             <small>Created on {{repo.created}}</small>
                                             <div class="ribbonWrapper" style="overflow:hidden;">
-                                                <a target="_blank" ng-href="repo.repoUrl"><img class="ribbon" src="images/fork.png" alt="Fork me on GitHub"></a>
+                                                <a target="_blank" ng-href="{{repo.repoUrl}}"><img class="ribbon" src="images/fork.png" alt="Fork me on GitHub"></a>
                                             </div>
                                         </blockquote>
                                     </div>

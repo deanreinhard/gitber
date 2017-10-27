@@ -90,20 +90,33 @@ App.factory('githubRepos', function($http) {
     function getRepos(username) {
         $http.get(API.repos(username)).then(function(response) {
             repos  = [];
-            for(var i = 0; i < response.data.length; i++) {
-                var value = response.data[i];
-                repos.push({
-                    name: value.name,
-                    created: value.created_at,
-                    repoUrl: value.clone_url,
-                    language: value.language,
-                    size: value.size,
-                    avatar: value.owner.avatar_url,
-                    owner: value.owner.login,
-                    readme: 'No readme found'
+            async.map(
+                response.data,
+                function (value, callback) {
+                    var repo = {
+                        name: value.name,
+                        created: value.created_at,
+                        repoUrl: value.clone_url,
+                        language: value.language,
+                        size: value.size,
+                        avatar: value.owner.avatar_url,
+                        owner: value.owner.login,
+                        readme: 'No readme found'
+                    };
+                    $http.get(API.readme(username, repo.name)).then(
+                        function(response){
+                            repo.readme = $.base64Decode(response.data.content);
+                            callback(null, repo)
+                        },
+                        function() {
+                            repo.readme = 'No readme found';
+                            callback(null, repo);
+                        }
+                    );
+                },
+                function (error, repos) {
+                    angular.copy(repos, Repos);
                 });
-            }
-            angular.copy(repos, Repos);
         });
     }
 

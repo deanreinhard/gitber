@@ -65,6 +65,49 @@ var App = angular.module('gitberApp', []);
 /**************************
 * Models
 **************************/
+App.factory('githubUser', function($http, recentSearches) {
+    var User = {};
+
+    function searchUser(username) {
+        // Stop search if username is blank
+        if(username.length === 0) return;
+
+        $http.get(API.user(username)).then(function(response){
+            User = response;
+            recentSearches.addUser(username);
+        });
+    }
+
+    return {
+        User: User,
+        searchUser: searchUser
+    };
+});
+
+App.factory('recentSearches', function() {
+    var Searches = [];
+
+    function addUser(username) {
+        if(Searches.indexOf(username) !== -1) {
+            removeUser(username);
+        }
+        Searches.push(username);
+    }
+
+    function removeUser(username) {
+        var index = Searches.indexOf(username);
+        if (index !== -1) {
+            Searches.splice(index, 1);
+        }
+    }
+
+    return {
+        Searches: Searches,
+        addUser: addUser,
+        removeUser: removeUser
+    };
+});
+
 
 /**************************
 * Views
@@ -73,59 +116,27 @@ var App = angular.module('gitberApp', []);
 /**************************
 * Controllers
 **************************/
-App.controller('userSearchCtrl', function($rootScope, $scope) {
+App.controller('userSearchCtrl', function($rootScope, $scope, githubUser, recentSearches) {
     $scope.username = '';
-    $scope.user = {};
+    $scope.history = recentSearches.Searches;
 
     $scope.loadUser = function(e) {
-        if($scope.username.length > 0) {
-            // Broadcast 'search' event
-            $rootScope.$broadcast('search', $scope.username);
+        githubUser.searchUser($scope.username);
 
-            githubService.user($scope.username, function(githubUser) {
-                if(githubUser) {
-                    $scope.user = githubUser;
-                    $scope.$apply();
-                }
-            });
-        }
-
-        // Prevent form submission
-        if(e){
-            e.preventDefault();
-        }
+        // Prevent Form Submission
+        e.preventDefault();
     };
+
+    $scope.searchAgain = function(username) {
+        $scope.username = username;
+        githubUser.searchUser(username);
+    };
+
+    $scope.removeUser = recentSearches.removeUser;
 });
 
 App.controller('orgSearchCtrl', function($rootScope, $scope) {
 
-});
-
-App.controller('recentSearchesCtrl', function($rootScope, $scope) {
-    $scope.usernames = [];
-
-    $rootScope.$on('search', function(e, username) {
-        $scope.usernames.push(username);
-    });
-
-    $scope.addUser = function(username){
-        if($scope.usernames.indexOf(username) !== -1) {
-            $scope.removeUser(username);
-        }
-        $scope.usernames.push(username);
-    };
-
-    $scope.removeUser = function(username) {
-        var index = $scope.usernames.indexOf(username);
-        if (index !== -1) {
-            $scope.usernames.splice(index, 1);
-        }
-    };
-
-    $scope.searchAgain = function(username) {
-        // NOOP
-        console.error('not implemented yet');
-    };
 });
 
 /**************************

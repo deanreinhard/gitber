@@ -8,9 +8,21 @@ var OAUTH_QUERY_STRING = '?client_id=' + CLIENT_KEY + '&client_secret=' + SECRET
 var API_URL = 'https://api.github.com';
 
 /**************************
+ * Application
+ **************************/
+
+/**
+ * Gitber Angular application
+ */
+var App = angular.module('gitberApp', []);
+
+/**************************
  * API
  **************************/
 
+/**
+ * API object that provides Url generators to githubApi service
+ */
 var API = {
     user: function(username) {
         return [API_URL, 'users', username].join('/') + OAUTH_QUERY_STRING;
@@ -27,15 +39,18 @@ var API = {
 };
 
 /**************************
- * Application
- **************************/
-var App = angular.module('gitberApp', []);
-
-/**************************
  * API Service
  **************************/
 
+/**
+ * Provides githubApi service that uses the Githbu RESTful Api service
+ */
 App.factory('githubApi', function($http) {
+
+    /**
+     * Gets a single Github user
+     * @param username string
+     */
     function user(username) {
         return $http.get(API.user(username)).then(function(response) {
             var value = response.data;
@@ -57,6 +72,10 @@ App.factory('githubApi', function($http) {
         });
     }
 
+    /**
+     * Gets a list of repositories belonging to a single Github user
+     * @param username string
+     */
     function repos(username) {
         return $http.get(API.repos(username)).then(function(response) {
             return new Promise(function(resolve) {
@@ -91,6 +110,10 @@ App.factory('githubApi', function($http) {
         });
     }
 
+    /**
+     * Gets a list of members belonging to a single Github organisation
+     * @param organisation
+     */
     function organisation(organisation) {
         return $http.get(API.organisation(organisation)).then(function(response) {
             var members  = [];
@@ -114,9 +137,22 @@ App.factory('githubApi', function($http) {
 /**************************
  * Models
  **************************/
+
+/**
+ * Model for storing current github user profile
+ */
 App.factory('githubUser', function(githubApi, recentSearches, githubRepos, githubUserForm) {
     var User = {};
 
+    /**
+     * Calls githubApi service to fetch user and stores the result
+     * Note: also calls githubUserForm to set the username value if
+     *       it's not the same
+     * Note: also adds username to the recent searches list
+     * Note: also calls githubRepos to update the repositories list belonging
+     *       to username being searched
+     * @param username string
+     */
     function searchUser(username) {
         // Stop search if username is blank
         if(username.length === 0) return;
@@ -137,9 +173,16 @@ App.factory('githubUser', function(githubApi, recentSearches, githubRepos, githu
     };
 });
 
+/**
+ * Model for storing current github repositories list
+ */
 App.factory('githubRepos', function(githubApi) {
     var Repos = [];
 
+    /**
+     * Calls githubApi service to fetch repositories and stores the results
+     * @param username string
+     */
     function getRepos(username) {
         githubApi.repos(username).then(function (repos) {
             angular.copy(repos, Repos);
@@ -152,9 +195,16 @@ App.factory('githubRepos', function(githubApi) {
     };
 });
 
+/**
+ * Model for storing current github organisation
+ */
 App.factory('githubOrganisation', function(githubApi) {
     var Members = [];
 
+    /**
+     * Calls githubApi service to fetch members and stores the results
+     * @param organisation string
+     */
     function getOrganisation(organisation) {
         githubApi.organisation(organisation).then(function(members) {
             angular.copy(members, Members);
@@ -167,9 +217,17 @@ App.factory('githubOrganisation', function(githubApi) {
     };
 });
 
+/**
+ * Model for recent searches list
+ */
 App.factory('recentSearches', function() {
     var Searches = [];
 
+    /**
+     * Appends a new username to recent searches
+     * Removes duplicate username values before appending the new one
+     * @param username string
+     */
     function addUser(username) {
         if(Searches.indexOf(username) !== -1) {
             removeUser(username);
@@ -177,6 +235,12 @@ App.factory('recentSearches', function() {
         Searches.push(username);
     }
 
+    /**
+     * Removes a username from recent searches
+     * There is at most one of each username, so only one value needs to be
+     * removed
+     * @param username
+     */
     function removeUser(username) {
         var index = Searches.indexOf(username);
         if (index !== -1) {
@@ -191,12 +255,23 @@ App.factory('recentSearches', function() {
     };
 });
 
+/**
+ * Model for user search form input value
+ * The purpose of this model is for search links to pass values that should be
+ * populated in the current user search input field
+ */
 App.factory('githubUserForm', function() {
-    // Need to create service as an object to keep reference to Username
-    // property. Otherwise angular will not be able to store changes
+    /**
+     * Need to create service as an object to keep reference to Username
+     * property. Otherwise angular will not be able to store changes
+     */
     var svc = {};
     svc.Username = '';
 
+    /**
+     * Sets current username value
+     * @param username string
+     */
     svc.setUsername = function(username) {
         svc.Username = username;
     };
@@ -207,9 +282,17 @@ App.factory('githubUserForm', function() {
 /**************************
  * Controllers
  **************************/
+
+/**
+ * Controller for User Search module
+ */
 App.controller('userSearchCtrl', function($scope, githubUserForm, githubUser) {
     $scope.username = githubUserForm.Username;
 
+    /**
+     * Action for user search form submission
+     * @param e Event object
+     */
     $scope.searchUser = function (e) {
         githubUser.searchUser($scope.username);
 
@@ -217,8 +300,10 @@ App.controller('userSearchCtrl', function($scope, githubUserForm, githubUser) {
         e.preventDefault();
     };
 
-    // Watch githubUserForm.Username for changes so that we can
-    // update $scope.username when search is toggled externally
+    /**
+     * Watch githubUserForm.Username for changes so that we can
+     * update $scope.username when search is toggled externally
+     */
     $scope.$watch(
         function () {
             return githubUserForm.Username;
@@ -231,16 +316,26 @@ App.controller('userSearchCtrl', function($scope, githubUserForm, githubUser) {
         true);
 });
 
+/**
+ * Controller for Recent Searches module
+ */
 App.controller('recentSearchesCtrl', function($scope, githubUser, recentSearches) {
     $scope.searches = recentSearches.Searches;
     $scope.searchAgain = githubUser.searchUser;
     $scope.removeUser = recentSearches.removeUser;
 });
 
+/**
+ * Controller for Organisation Search module
+ */
 App.controller('orgSearchCtrl', function($scope, githubOrganisation, githubUserForm, githubUser) {
     $scope.organisation = '';
     $scope.members = githubOrganisation.Members;
 
+    /**
+     * Action for organisation search form submission
+     * @param e Event object
+     */
     $scope.searchOrganisation = function(e) {
         githubOrganisation.getOrganisation($scope.organisation);
 
@@ -251,10 +346,16 @@ App.controller('orgSearchCtrl', function($scope, githubOrganisation, githubUserF
     $scope.searchUser = githubUser.searchUser;
 });
 
+/**
+ * Controller for Repository listing module
+ */
 App.controller('reposCtrl', function($scope, githubRepos) {
     $scope.repos = githubRepos.Repos;
 });
 
+/**
+ * Controller for User biography module
+ */
 App.controller('userBioCtrl', function($scope, githubUser) {
     $scope.user = githubUser.User;
 });
@@ -262,6 +363,10 @@ App.controller('userBioCtrl', function($scope, githubUser) {
 /**************************
  * Filters
  **************************/
+
+/**
+ * Filter that reverses order of items in input array
+ */
 App.filter('reverse', function() {
     return function(items) {
         return items.slice().reverse();

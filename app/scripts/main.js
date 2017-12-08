@@ -1,8 +1,9 @@
 "use strict";
 
-// Init main Angular app
+// Define the gitberApp module
 var gitberApp = angular.module("gitberApp", []);
 
+// Factory
 gitberApp.factory("githubFactory", function($http) {
     // API endpoint and keys for authentication
     var githubAPI = "https://api.github.com";
@@ -13,6 +14,14 @@ gitberApp.factory("githubFactory", function($http) {
     var searchedUsers = [];
     var user = "";
 
+    /**
+     * Add user to array of searched usernames that have been searched for previously
+     * 1) If user exists in array, remove first
+     * 2) Then readd to the front of the array
+     * 3) If array exceeds 5 elements, remove 1 from end of the array (oldest)
+     *
+     * @param {string} username The user to add to the array
+     **/
     function addUser(username) {
         var idx = searchedUsers.indexOf(username);
 
@@ -27,11 +36,24 @@ gitberApp.factory("githubFactory", function($http) {
         }
     }
 
+    //
     return {
+        /**
+         * Remove user from array of searched usernames when X is clicked
+         *
+         * @param {string} username The user to remove from the array
+         **/
         removeUser: function(username) {
             searchedUsers.splice(searchedUsers.indexOf(username), 1);
         },
 
+        /**
+         * Calls Github User API to load user data and adds user to array of searched usernames
+         * Returned data from API ...
+         *
+         * @param {string} username The user to load the data for
+         * @return {Object} The user data returned from the Github API
+         **/
         loadUser: function(username) {
             addUser(username);
 
@@ -41,6 +63,14 @@ gitberApp.factory("githubFactory", function($http) {
                 });
         },
 
+        /**
+         * Calls Github Repo API to load user repos data
+         * Further calls the API to load the README file data (if available)
+         * Returned data from API ...
+         *
+         * @param {string} username The user to load the data for
+         * @return {Object} The user repo data returned from the Github API
+         **/
         loadRepos: function(username) {
             return $http.get(githubAPI + "/users/" + username + "/repos" + oauth)
                 .then(function(response) {
@@ -66,10 +96,14 @@ gitberApp.factory("githubFactory", function($http) {
 
         },
 
+        /**
+         * Array of previously searched usernames - limit to 5
+         **/
         searchedUsers: searchedUsers
     }
 });
 
+// Controller
 gitberApp.controller("gitberController", function($scope, githubFactory) {
     $scope.searchedUsers = githubFactory.searchedUsers;
 

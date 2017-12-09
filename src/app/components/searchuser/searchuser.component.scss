@@ -1,0 +1,26 @@
+:host {
+  width: 100%;
+  display: block;
+}
+
+ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  max-height: 244px;
+  overflow: auto;
+  li {
+    display: block;
+    line-height: 40px;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    &:nth-child(2n) {
+      background: #f2f2f2;
+    }
+    a {
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+}

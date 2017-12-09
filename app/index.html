@@ -185,9 +185,11 @@
 			*::-webkit-scrollbar-button{height:15px;border:3px solid #457e82;border-radius:8px;background:#FFF;}
 			*::-webkit-scrollbar-thumb{border-radius:10px;background:#457e82;}
 			#userData{margin-bottom:150px;}
+
+            [ng-cloak] {display: none !important;}
         </style>
     </head>
-    <body ng-controller="gitberController">
+    <body ng-controller="gitberController" ng-cloak>
         <div class="gitber container" id="tagHeading" style="position:fixed; text-align:center;" data-0="margin-top:-50px;" data-anchor-target="#fitHeader" data-50-top-bottom="margin-top:-50px;" data--250-top-bottom="margin-top:0px;">
             <p>GitBer!</p>
         </div>

@@ -1,179 +1,199 @@
-/**************************
-* Application
-**************************/
-App = Em.Application.create();
+"use strict";
 
-/**************************
-* Models
-**************************/
-App.repo = Em.Object.extend({
- 
-});
+/**
+ * Define the gitberApp module
+ **/
+var gitberApp = angular.module("gitberApp", []);
 
-App.githubUser = Em.Object.extend({
- 
-});
 
-App.orgMembers = Em.Object.extend({
- 
-});
+/**
+ * Factory
+ *  responsible for:
+ *  - calling and retrieving data from Github API
+ *  - maintaining list of past searches
+ **/
+gitberApp.factory("githubFactory", function($http) {
+    // API endpoint and keys for authentication
+    var githubAPI = "https://api.github.com";
+    var client = "69af424226e15a6396dd";
+    var secret = "683d05837403207f247939ab21668065352b65db";
+    var oauth  = "?client_id=" + client + "&client_secret=" + secret;
 
-/**************************
-* Views
-**************************/
-App.SearchTextField = Em.TextField.extend({
-    insertNewline: function(){
-        App.reposController.loadrepos();
+    var searchedUsers = [];
+    var user = "";
+
+    /**
+     * Add user to array of searched usernames that have been searched for previously
+     * 1) If user exists in array, remove first
+     * 2) Then readd to the front of the array
+     * 3) If there are > 5 past searches, remove 1 from end of the array (oldest)
+     *
+     * @param {string} username The user to add to the array
+     **/
+    function addUser(username) {
+        var idx = searchedUsers.indexOf(username);
+
+        if (idx !== -1) {
+            searchedUsers.splice(idx, 1);
+        }
+
+        searchedUsers.unshift(username);
+
+        if (searchedUsers.length > 5) {
+            searchedUsers.pop();
+        }
     }
-});
-App.OrganisationSearchTextField = Em.TextField.extend({
-    insertNewline: function(){
-        App.organisationUserController.loadOrganisation();
-    }
-});
-var client='69af424226e15a6396dd';
-var secret='683d05837403207f247939ab21668065352b65db';
-var oauth = '?client_id='+client+'&client_secret='+secret;
-/**************************
-* Controllers
-**************************/
-App.reposController = Em.ArrayController.create({
-    content: [],
-    username: '',
-    loadrepos: function(username,name) {
-        var me = this;
-        var username = me.get("username");
-        if ( username ) {
-            var url = 'https://api.github.com/users/'+username+'/repos'+oauth;
-            App.recentUsersController.addUser(username);
-            me.set('content', []);
-            $.getJSON(url,function(data){
-                me.set('content', []);
-                async.map(
-                  data,
-                  function(repo, callback){
-				  var success = false;
-                    var url = 'https://api.github.com/repos/'+username+'/'+repo.name+'/readme'+oauth;
-                    $.getJSON(url, function(readme){
-						success = true;
-						repo.readmeFile = $.base64Decode(readme.content);
-                      callback(null, repo);
-                    });
-					setTimeout(function() {
-						if (!success)
-						{
-								repo.readmeFile = "No readme found";
-								callback(null, repo);
-						}
-					}, 2200);
-                  },
-                  function(error, reposWithReadme){
-                    $(reposWithReadme).each(function(index,value){
-                      var repoArray = App.repo.create({
-                          name: value.name,
-                          created: value.created_at,
-                          repoUrl: value.clone_url,
-                          language: value.language,
-                          size: value.size,
-                          avatar: value.owner.avatar_url,
-                          owner: value.owner.login,
-                          readme: value.readmeFile
-                      });
-                      me.pushObject(repoArray);
-                  });
+
+    return {
+        /**
+         * Remove user from array of searched usernames when X is clicked
+         *
+         * @param {string} username The user to remove from the array
+         **/
+        removeUser: function(username) {
+            searchedUsers.splice(searchedUsers.indexOf(username), 1);
+        },
+
+        /**
+         * Calls Github User API to load user data and adds user to array of searched usernames
+         *
+         * @param {string} username The user to load the data for
+         * @return {Object} The user data returned from the Github API
+         **/
+        loadUser: function(username) {
+            addUser(username);
+
+            return $http.get(githubAPI + "/users/" + username + oauth)
+                .then(function(response) {
+                    return response.data;
                 });
-            });
-        App.githubUserController.loadUser(username);
-        }
+        },
+
+        /**
+         * Calls Github Repo API to load user repos data
+         * Further calls the API to load the README file data (if available)
+         *
+         * @param {string} username The user to load the data for
+         * @return {Object} The user repo data returned from the Github API
+         **/
+        loadRepos: function(username) {
+            return $http.get(githubAPI + "/users/" + username + "/repos" + oauth)
+                .then(function(response) {
+                    async.map(
+                        response.data,
+                        function(repo, callback) {
+                            $http.get(githubAPI + "/repos/" + username + "/" + repo.name + "/readme" + oauth)
+                                .then(
+                                    function(response) {
+                                        repo.readme = $.base64Decode(response.data.content);
+                                    },
+                                    function(response) {
+                                        repo.readme = "No readme found";
+                                    });
+                        }
+                    );
+
+                    return response.data;
+                });
+        },
+
+        /**
+         * Calls Github Organizations API to load organisation members data
+         *
+         * @param {string} orgname The name of the organisation to load the data for
+         * @return {Object} The organisation member data returned from the Github API
+         **/
+        loadOrganisation: function(orgname) {
+            return $http.get(githubAPI + "/orgs/" + orgname + "/members" + oauth)
+                .then(function(response) {
+                    return response.data;
+                });
+        },
+
+        /**
+         * Array of previously searched usernames - limit to 5
+         **/
+        searchedUsers: searchedUsers
     }
 });
 
-App.githubUserController = Em.ArrayController.create({
-    content: [],
-    loadUser: function(username,name) {
-        var me = this;
-        if ( username ) {
-            var url = 'https://api.github.com/users/'+username+''+oauth;
-            // push username to recent user array
-            me.set('content', []);
-            $.getJSON(url,function(data){
-                me.set('content', []);
-                $(data).each(function(index,value){
-                    var githubUserArray = App.githubUser.create({
-                        username: value.login,
-                        avatar: value.avatar_url,
-                        name: value.name,
-                        company: value.company,
-                        blog: value.blog,
-                        location: value.location,
-                        email: value.email,
-                        hireable: value.hireable,
-                        bio: value.bio,
-                        repos: value.public_repos,
-                        followers: value.followers,
-                        joined: value.created_at
-                    });
-                    me.pushObject(githubUserArray);
-                })
+/**
+ * Controller
+ *  responsible for:
+ *  - binding data to view
+ *  - implementing logic to view
+ **/
+gitberApp.controller("gitberController", function($scope, githubFactory) {
+    $scope.searchedUsers = githubFactory.searchedUsers;
+
+    /**
+     * Called when a Github username is submitted
+     * Reset $scope user data before call API in case username is not found
+     * Augments $scope with user data retrieved from Github API
+     **/
+    $scope.findUser = function() {
+        $scope.user = "";
+        $scope.repos = "";
+
+        githubFactory.loadUser($scope.username)
+            .then(function(user) {
+                $scope.user = user;
             });
-        }App.recentUsersController.addUser(username);
-    }
-});
 
-
-App.organisationUserController = Em.ArrayController.create({
-	organisation: '',
-    content: [],
-    loadOrganisation: function(organisation,name) {
-        var me = this;
-		var organisation = me.get("organisation");
-        if ( organisation ) {
-            var url = 'https://api.github.com/orgs/'+organisation+'/members'+oauth;
-            me.set('content', []);
-            $.getJSON(url,function(data){
-                me.set('content', []);
-                $(data).each(function(index,value){
-                    var organisationUserArray = App.githubUser.create({
-                        orgUsername: value.login
-                    });
-                    me.pushObject(organisationUserArray);
-                })
+        githubFactory.loadRepos($scope.username)
+            .then(function(repos) {
+                $scope.repos = repos;
             });
-        }
-    },
-	searchOrgUser: function(view){
-        App.reposController.set('username', view.context.orgUsername);
-        App.reposController.loadrepos();
-    }
-});
-
-
-
- function formatJoinDate(joined) {
-        var joined = Date.parse(joined);
-        return joined.toString("d MMMM yyyy");
     };
 
+    /**
+     * Called when a Github username is clicked on in search list
+     * Resets username and retrieves user data from Github API
+     **/
+    $scope.searchAgain = function(username) {
+        $scope.username = username;
+        $scope.findUser();
+    };
 
-////////////////////////////////////////////////////////////////////////////////////////
-App.recentUsersController = Em.ArrayController.create({
-    content: [],
-    addUser: function(name) {
-        if ( this.contains(name) ) this.removeObject(name);
-        this.pushObject(name);
-        if (this.get('content').length > 5){
-            this.get('content').splice(0,1);
-        };
-    },
-    removeUser: function(view){
-        this.removeObject(view.context);
-    },
-    searchAgain: function(view){
-        App.reposController.set('username', view.context);
-        App.reposController.loadrepos();
-    },
-    reverse: function(){
-        return this.toArray().reverse();
-    }.property('@each')
+    /**
+     * Called when X is clicked to remove username from list
+     **/
+    $scope.removeUser = githubFactory.removeUser;
+
+    /**
+     * Called when a Github organisation name is submitted
+     * Reset $scope organisation members data before call API in case organisation name is not found
+     * Augments $scope with organisation members data retrieved from Github API
+     **/
+    $scope.findOrg = function() {
+        $scope.orgMembers = "";
+
+        githubFactory.loadOrganisation($scope.orgname)
+            .then(function(orgMembers) {
+                $scope.orgMembers = orgMembers;
+            });
+    };
+
+    /**
+     * Called when a Github username is clicked on in the organisation member list
+     * Augments $scope with organisation member data retrieved from Github API
+     **/
+    $scope.searchOrgMember = function(memberName) {
+        $scope.username = memberName;
+        $scope.findUser();
+    };
+});
+
+/**
+ * Filter
+ *  formatDate - parse and return date in desired format
+ **/
+gitberApp.filter("formatDate", function($filter) {
+    return function(input) {
+        if (input === null)
+            return "";
+
+        return $filter("date")(new Date(input), "d MMMM yyyy");
+    };
 });
 

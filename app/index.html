@@ -224,6 +224,12 @@
 					<div class="row-fluid" >
                         <div class="searched white">
                             <div class="input-append" style="margin-top:15px; padding-left:10px;">
+
+<div class="organisation">
+    <input class="span8" ng-model="orgname" placeholder="Organisation Name" type="text" value="" onclick="this.focus();this.select();">
+    <button class="btn btn-info" ng-click="findOrg()">Go!</button>
+</div>
+
                                 <script type="text/x-handlebars">
                                 {{view App.OrganisationSearchTextField placeholder="Organisation Name" valueBinding="App.organisationUserController.organisation" class="span8"}}
                                 <button class="btn btn-info" {{action "loadOrganisation" target="App.organisationUserController"}}>Go!</button>
@@ -231,6 +237,11 @@
                             </div>
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">Organisation Members</p>
                             <ul class="unstyled recentSearches table-striped" style="max-height:171px; overflow:auto;">
+
+<li ng-repeat="member in orgMembers">
+    <a href="#" title="View repos" ng-click="searchOrgMember(member.login)">{{member.login}}</a>
+</li>
+
                                  <script type="text/x-handlebars">
                                  {{#each App.organisationUserController}}
                                     <li>
@@ -247,51 +258,52 @@
                         <div id="userData" class="searched white">
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">User Bio</p>
 
-                            <div class="row-fluid" ng-show="data">
+                            <div class="row-fluid" ng-show="user">
                                 <div class="span12" style="padding-left:10px;padding-right:100px;">
-                                    <p ng-show="data.name"><strong>1Name:</strong> {{data.name}}</p>
-                                    <p><strong>Username:</strong> {{data.login}}</p>
-                                    <p ng-show="data.company"><strong>Company:</strong> {{data.company}}</p>
-                                    <p><strong>Repos:</strong> {{data.public_repos}}</p>
-                                    <p><strong>Followers:</strong> {{data.followers}}</p>
-                                    <p><strong>Joined on:</strong> {{data.created_at}}</p>
+                                    <p ng-show="user.name"><strong>1Name:</strong> {{user.name}}</p>
+                                    <p><strong>Username:</strong> {{user.login}}</p>
+                                    <p ng-show="user.company"><strong>Company:</strong> {{user.company}}</p>
+                                    <p><strong>Repos:</strong> {{user.public_repos}}</p>
+                                    <p><strong>Followers:</strong> {{user.followers}}</p>
+                                    <p><strong>Joined on:</strong> {{user.created_at}}</p>
+
                                 </div>
 
-                                <img class="avatar img-polaroid" ng-src="{{data.avatar_url}}" />
+                                <img class="avatar img-polaroid" ng-src="{{user.avatar_url}}" />
                             </div>
                             <div class="row-fluid visible-phone phoneButtons">
                                 <div class="phone-button">
-                                    <a class="btn btn-primary btn-large" ng-href="mailto:{{data.email}}" ng-show="data.email"><i class="icon-envelope-alt icon-4x"></i></a>
+                                    <a class="btn btn-primary btn-large" ng-href="mailto:{{user.email}}" ng-show="user.email"><i class="icon-envelope-alt icon-4x"></i></a>
                                 </div>
                                 <div class="phone-button">
-                                     <a class="btn btn-warning btn-large" ng-href="{{data.blog}}" target="_blank" ng-show="data.blog"><i class="icon-comments icon-4x"></i></a>
+                                     <a class="btn btn-warning btn-large" ng-href="{{user.blog}}" target="_blank" ng-show="user.blog"><i class="icon-comments icon-4x"></i></a>
                                 </div>
                                 <div class="phone-button">
-                                    <a class="btn btn-danger btn-large" ng-href="{{data.location}}" target="_blank" ng-show="data.location"><i class="icon-map-marker icon-4x"></i></a>
+                                    <a class="btn btn-danger btn-large" ng-href="{{user.location}}" target="_blank" ng-show="user.location"><i class="icon-map-marker icon-4x"></i></a>
                                 </div>
                                 <div class="phone-button">
-                                    <a class="btn btn-inverse btn-large" ng-href="{{data.blog}}" target="_blank" ng-show="data.hireable"><i class="icon-suitcase icon-4x"></i></a>
+                                    <a class="btn btn-inverse btn-large" ng-href="{{user.blog}}" target="_blank" ng-show="user.hireable"><i class="icon-suitcase icon-4x"></i></a>
                                 </div>
                             </div>
                             <div class="row-fluid hidden-phone" style="position:absolute; margin-top:10px;overflow:hidden;">
-                                <div class="span3" ng-show="data.email">
+                                <div class="span3" ng-show="user.email">
                                     <div class="ribbon emailTag" style="position:relative;">
-                                        <a ng-href="mailto:{{data.email}}"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Email</p><i class="icon-envelope-alt icon-2x"></i></span></a>
+                                        <a ng-href="mailto:{{user.email}}"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Email</p><i class="icon-envelope-alt icon-2x"></i></span></a>
                                     </div>
                                 </div>
-                                <div class="span3" ng-show="data.blog">
+                                <div class="span3" ng-show="user.blog">
                                     <div class="ribbon blogtag" style="position:relative;">
-                                        <a ng-href="{{data.blog}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Blog</p><i class="icon-comments icon-2x"></i></span></a>
+                                        <a ng-href="{{user.blog}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Blog</p><i class="icon-comments icon-2x"></i></span></a>
                                     </div>
                                 </div>
-                                <div class="span3" ng-show="data.location">
+                                <div class="span3" ng-show="user.location">
                                     <div class="ribbon localeTag" style="position:relative;">
-                                        <a ng-href="{{data.location}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Locale</p><i class="icon-map-marker icon-2x"></i></span></a>
+                                        <a ng-href="{{user.location}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Locale</p><i class="icon-map-marker icon-2x"></i></span></a>
                                     </div>
                                 </div>
-                                <div class="span3" ng-show="data.hireable">
+                                <div class="span3" ng-show="user.hireable">
                                     <div class="ribbon hireTag" style="position:relative;">
-                                        <a ng-href="{{data.blog}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead"  style="color:#fff;">Hire</p><i class="icon-suitcase icon-2x"></i></span></a>
+                                        <a ng-href="{{user.blog}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead"  style="color:#fff;">Hire</p><i class="icon-suitcase icon-2x"></i></span></a>
                                     </div>
                                 </div>
                             </div>

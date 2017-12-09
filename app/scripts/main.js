@@ -49,7 +49,6 @@ gitberApp.factory("githubFactory", function($http) {
 
         /**
          * Calls Github User API to load user data and adds user to array of searched usernames
-         * Returned data from API ...
          *
          * @param {string} username The user to load the data for
          * @return {Object} The user data returned from the Github API
@@ -66,7 +65,6 @@ gitberApp.factory("githubFactory", function($http) {
         /**
          * Calls Github Repo API to load user repos data
          * Further calls the API to load the README file data (if available)
-         * Returned data from API ...
          *
          * @param {string} username The user to load the data for
          * @return {Object} The user repo data returned from the Github API
@@ -92,8 +90,17 @@ gitberApp.factory("githubFactory", function($http) {
                 });
         },
 
-        recentUsers: function() {
-
+        /**
+         * Calls Github Organizations API to load organisation members data
+         *
+         * @param {string} orgname The name of the organisation to load the data for
+         * @return {Object} The organisation member data returned from the Github API
+         **/
+        loadOrganisation: function(orgname) {
+            return $http.get(githubAPI + "/orgs/" + orgname + "/members" + oauth)
+                .then(function(response) {
+                    return response.data;
+                });
         },
 
         /**
@@ -109,8 +116,8 @@ gitberApp.controller("gitberController", function($scope, githubFactory) {
 
     $scope.findUser = function() {
         githubFactory.loadUser($scope.username)
-            .then(function(data) {
-                $scope.data = data;
+            .then(function(user) {
+                $scope.user = user;
             });
 
         githubFactory.loadRepos($scope.username)
@@ -125,4 +132,17 @@ gitberApp.controller("gitberController", function($scope, githubFactory) {
     };
 
     $scope.removeUser = githubFactory.removeUser;
+
+    $scope.findOrg = function() {
+        githubFactory.loadOrganisation($scope.orgname)
+            .then(function(orgMembers) {
+                $scope.orgMembers = orgMembers;
+            });
+    };
+
+    $scope.searchOrgMember = function(memberName) {
+        $scope.username = memberName;
+        $scope.findUser();
+    };
+
 });

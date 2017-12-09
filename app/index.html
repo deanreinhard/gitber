@@ -225,30 +225,19 @@
                         <div class="searched white">
                             <div class="input-append" style="margin-top:15px; padding-left:10px;">
 
-<div class="organisation">
-    <input class="span8" ng-model="orgname" placeholder="Organisation Name" type="text" value="" onclick="this.focus();this.select();">
-    <button class="btn btn-info" ng-click="findOrg()">Go!</button>
-</div>
+                                <div class="organisation">
+                                    <input class="span8" ng-model="orgname" placeholder="Organisation Name" type="text" value="" onclick="this.focus();this.select();">
+                                    <button class="btn btn-info" ng-click="findOrg()">Go!</button>
+                                </div>
 
-                                <script type="text/x-handlebars">
-                                {{view App.OrganisationSearchTextField placeholder="Organisation Name" valueBinding="App.organisationUserController.organisation" class="span8"}}
-                                <button class="btn btn-info" {{action "loadOrganisation" target="App.organisationUserController"}}>Go!</button>
-                                </script>
                             </div>
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">Organisation Members</p>
                             <ul class="unstyled recentSearches table-striped" style="max-height:171px; overflow:auto;">
 
-<li ng-repeat="member in orgMembers">
-    <a href="#" title="View repos" ng-click="searchOrgMember(member.login)">{{member.login}}</a>
-</li>
+                                <li ng-repeat="member in orgMembers">
+                                    <a href="#" title="View repos" ng-click="searchOrgMember(member.login)">{{member.login}}</a>
+                                </li>
 
-                                 <script type="text/x-handlebars">
-                                 {{#each App.organisationUserController}}
-                                    <li>
-                                        <a href="#" title="view repos" {{action "searchOrgUser" target="App.organisationUserController"}}>{{orgUsername}}</a>
-                                    </li>
-                                {{/each}}
-                                </script>
                             </ul>
                         </div>
                     </div>

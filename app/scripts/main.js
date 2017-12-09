@@ -1,9 +1,17 @@
 "use strict";
 
-// Define the gitberApp module
+/**
+ * Define the gitberApp module
+ **/
 var gitberApp = angular.module("gitberApp", []);
 
-// Factory
+
+/**
+ * Factory
+ *  responsible for:
+ *  - calling and retrieving data from Github API
+ *  - maintaining list of past searches
+ **/
 gitberApp.factory("githubFactory", function($http) {
     // API endpoint and keys for authentication
     var githubAPI = "https://api.github.com";
@@ -18,7 +26,7 @@ gitberApp.factory("githubFactory", function($http) {
      * Add user to array of searched usernames that have been searched for previously
      * 1) If user exists in array, remove first
      * 2) Then readd to the front of the array
-     * 3) If array exceeds 5 elements, remove 1 from end of the array (oldest)
+     * 3) If there are > 5 past searches, remove 1 from end of the array (oldest)
      *
      * @param {string} username The user to add to the array
      **/
@@ -36,7 +44,6 @@ gitberApp.factory("githubFactory", function($http) {
         }
     }
 
-    //
     return {
         /**
          * Remove user from array of searched usernames when X is clicked
@@ -110,10 +117,19 @@ gitberApp.factory("githubFactory", function($http) {
     }
 });
 
-// Controller
+/**
+ * Controller
+ *  responsible for:
+ *  - binding data to view
+ *  - implementing logic to view
+ **/
 gitberApp.controller("gitberController", function($scope, githubFactory) {
     $scope.searchedUsers = githubFactory.searchedUsers;
 
+    /**
+     * Called when a Github username is submitted
+     * Augments $scope with user data retrieved from Github API
+     **/
     $scope.findUser = function() {
         githubFactory.loadUser($scope.username)
             .then(function(user) {
@@ -126,11 +142,18 @@ gitberApp.controller("gitberController", function($scope, githubFactory) {
             });
     };
 
+    /**
+     * Called when a Github username is clicked on in search list
+     * Resets username and retrieves user data from Github API
+     **/
     $scope.searchAgain = function(username) {
         $scope.username = username;
         $scope.findUser();
     };
 
+    /**
+     * Called when X is clicked to remove username from list
+     **/
     $scope.removeUser = githubFactory.removeUser;
 
     $scope.findOrg = function() {
@@ -140,6 +163,10 @@ gitberApp.controller("gitberController", function($scope, githubFactory) {
             });
     };
 
+    /**
+     * Called when a Github username is clicked on in the organisation member list
+     * Augments $scope with organisation member data retrieved from Github API
+     **/
     $scope.searchOrgMember = function(memberName) {
         $scope.username = memberName;
         $scope.findUser();

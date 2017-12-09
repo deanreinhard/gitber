@@ -265,8 +265,7 @@
                                     <p ng-show="user.company"><strong>Company:</strong> {{user.company}}</p>
                                     <p><strong>Repos:</strong> {{user.public_repos}}</p>
                                     <p><strong>Followers:</strong> {{user.followers}}</p>
-                                    <p><strong>Joined on:</strong> {{user.created_at}}</p>
-
+                                    <p><strong>Joined on:</strong> {{user.created_at | formatDate}}</p>
                                 </div>
 
                                 <img class="avatar img-polaroid" ng-src="{{user.avatar_url}}" />
@@ -331,8 +330,7 @@
                                                     <pre>{{repo.readme}}</pre>
                                                 </div>
                                             </div>
-
-                                            <small>Created on {{repo.created_at}}</small>
+                                            <small>Created on {{repo.created_at | formatDate}}</small>
                                         <div class="ribbonWrapper" style="overflow:hidden;">
                                          <a target="_blank" ng-href="{{repo.url}}"><img class="ribbon" src="images/fork.png" alt="Fork me on GitHub"></a>
                                         </div>

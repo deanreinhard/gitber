@@ -144,5 +144,18 @@ gitberApp.controller("gitberController", function($scope, githubFactory) {
         $scope.username = memberName;
         $scope.findUser();
     };
-
 });
+
+/**
+ * Filter
+ *  formatDate - parse and return date in desired format
+ **/
+gitberApp.filter("formatDate", function($filter) {
+    return function(input) {
+        if (input === null)
+            return "";
+
+        return $filter("date")(new Date(input), "d MMMM yyyy");
+    };
+});
+

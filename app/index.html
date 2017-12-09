@@ -206,7 +206,7 @@
 
                             <div class="input-append" style="margin-top:15px; padding-left:10px;">
                                 <div class="username">
-                                    <input class="span8" ng-model="username" placeholder="Github username" type="text" value="" onclick="this.focus();this.select();">
+                                    <input class="span8" ng-model="username" ng-keyup="($event.which === 13) ? findUser() : 0" placeholder="Github username" type="text" value="" onclick="this.focus();this.select();">
                                     <button class="btn btn-info" ng-click="findUser()">Go!</button>
                                 </div>
                             </div>
@@ -228,7 +228,7 @@
                             <div class="input-append" style="margin-top:15px; padding-left:10px;">
 
                                 <div class="organisation">
-                                    <input class="span8" ng-model="orgname" placeholder="Organisation Name" type="text" value="" onclick="this.focus();this.select();">
+                                    <input class="span8" ng-model="orgname" ng-keyup="($event.which === 13) ? findOrg() : 0" placeholder="Organisation Name" type="text" value="" onclick="this.focus();this.select();">
                                     <button class="btn btn-info" ng-click="findOrg()">Go!</button>
                                 </div>
 

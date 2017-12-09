@@ -128,9 +128,13 @@ gitberApp.controller("gitberController", function($scope, githubFactory) {
 
     /**
      * Called when a Github username is submitted
+     * Reset $scope user data before call API in case username is not found
      * Augments $scope with user data retrieved from Github API
      **/
     $scope.findUser = function() {
+        $scope.user = "";
+        $scope.repos = "";
+
         githubFactory.loadUser($scope.username)
             .then(function(user) {
                 $scope.user = user;
@@ -156,7 +160,14 @@ gitberApp.controller("gitberController", function($scope, githubFactory) {
      **/
     $scope.removeUser = githubFactory.removeUser;
 
+    /**
+     * Called when a Github organisation name is submitted
+     * Reset $scope organisation members data before call API in case organisation name is not found
+     * Augments $scope with organisation members data retrieved from Github API
+     **/
     $scope.findOrg = function() {
+        $scope.orgMembers = "";
+
         githubFactory.loadOrganisation($scope.orgname)
             .then(function(orgMembers) {
                 $scope.orgMembers = orgMembers;

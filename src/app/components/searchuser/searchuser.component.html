@@ -1,0 +1,24 @@
+<mat-card class="full-width">
+  <mat-card-title>Search User</mat-card-title>
+  <mat-card-content>
+
+    <mat-form-field class="full-width">
+      <input matInput placeholder="Github username" [value]="query" (input)="query = $event.target.value"/>
+    </mat-form-field>
+    <button (click)="searchUser()" class="full-width" mat-raised-button color="primary">Search</button>
+    <ul>
+      <li *ngFor="let name of history">
+        <div class="row">
+          <div class="col-xs-10">
+            <a href="javascript:;" (click)="select(name)">{{name}}</a>
+          </div>
+          <div class="col-xs-2">
+            <button mat-mini-fab color="warn" (click)="remove(name)">
+              <i class="fa fa-remove"></i>
+            </button>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </mat-card-content>
+</mat-card>

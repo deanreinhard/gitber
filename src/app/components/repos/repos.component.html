@@ -1,0 +1,15 @@
+<mat-card class="full-width">
+  <mat-card-title>User Repositories</mat-card-title>
+  <mat-card-content>
+
+    <ul>
+      <li *ngFor="let repo of repos">
+        <div class="row">
+          <div class="col-xs-12">
+            <app-repo [repo]="repo"></app-repo>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </mat-card-content>
+</mat-card>

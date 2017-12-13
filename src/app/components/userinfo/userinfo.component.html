@@ -1,0 +1,54 @@
+<mat-card class="full-width">
+  <mat-card-title>User Bio</mat-card-title>
+  <mat-card-content>
+
+    <div class="row">
+      <div class="col-md-8 col-xs-12">
+        <div class="row" *ngIf="user.name">
+          <div class="col-md-4 col-xs-12"><label>Name:</label></div>
+          <div class="col-md-8 col-xs-12">{{user.name}}</div>
+        </div>
+        <div class="row">
+          <div class="col-md-4 col-xs-12"><label>Username:</label></div>
+          <div class="col-md-8 col-xs-12">{{user.login}}</div>
+        </div>
+        <div class="row">
+          <div class="col-md-4 col-xs-12"><label>Repos:</label></div>
+          <div class="col-md-8 col-xs-12">{{user.public_repos}}</div>
+        </div>
+        <div class="row">
+          <div class="col-md-4 col-xs-12"><label>Followers:</label></div>
+          <div class="col-md-8 col-xs-12">{{user.followers}}</div>
+        </div>
+        <div class="row">
+          <div class="col-md-4 col-xs-12"><label>Joined on:</label></div>
+          <div class="col-md-8 col-xs-12">{{user.created_at}}</div>
+        </div>
+
+      </div>
+      <div class="col-md-4 col-xs-12" *ngIf="user.avatar_url">
+        <div class="img-wrapper">
+          <img [src]="user.avatar_url"/>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+
+      <div class="col-xs-12 buttons" *ngIf="user.email || user.blog || user.location || (user.hireable && user.blog)">
+        <a *ngIf="user.email" href="mailto:{{user.email}}" mat-mini-fab color="primary">
+          <i class="fa fa-envelope"></i>
+        </a>
+        <a target="_blank" *ngIf="user.blog" [href]="user.blog" mat-mini-fab color="primary">
+          <i class="fa fa-comments"></i>
+        </a>
+        <a target="_blank" *ngIf="user.location" [href]="user.location" mat-mini-fab color="primary">
+          <i class="fa fa-map"></i>
+        </a>
+        <a target="_blank" *ngIf="user.hireable && user.blog" [href]="user.blog" mat-mini-fab color="primary">
+          <i class="fa fa-suitcase"></i>
+        </a>
+      </div>
+    </div>
+
+  </mat-card-content>
+</mat-card>

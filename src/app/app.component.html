@@ -1,0 +1,21 @@
+<!-- application header -->
+<app-header></app-header>
+
+<!-- application content-->
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4 col-xs-12">
+
+      <app-searchuser [search]="searchUser"></app-searchuser>
+      <app-searchorg [select]="onUserSelect"></app-searchorg>
+      <app-userinfo *ngIf="user" [user]="user"></app-userinfo>
+    </div>
+    <div class="col-md-8 col-xs-12">
+      <app-repos *ngIf="repos.length > 0" [repos]="repos"></app-repos>
+    </div>
+  </div>
+
+</div>
+
+<!-- application footer -->
+<app-footer></app-footer>

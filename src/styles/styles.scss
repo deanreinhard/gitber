@@ -1,0 +1,29 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700');
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+@import './flexbox';
+
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+body {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  background: #fafafa;
+  padding-top: 70px;
+  padding-bottom: 70px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.mat-card {
+  margin: 10px 0;
+}
+
+.full-width {
+  width: 100%;
+}

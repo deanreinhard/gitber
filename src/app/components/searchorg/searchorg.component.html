@@ -1,0 +1,19 @@
+<mat-card class="full-width">
+  <mat-card-title>Search Organisation</mat-card-title>
+  <mat-card-content>
+
+    <mat-form-field class="full-width">
+      <input matInput placeholder="Organisation Name" [value]="query" (input)="query = $event.target.value"/>
+    </mat-form-field>
+    <button (click)="onSearch()" class="full-width" mat-raised-button color="primary">Search</button>
+    <ul>
+      <li *ngFor="let user of users">
+        <div class="row">
+          <div class="col-xs-12">
+            <a href="javascript:;" (click)="select(user.login)">{{user.login}}</a>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </mat-card-content>
+</mat-card>

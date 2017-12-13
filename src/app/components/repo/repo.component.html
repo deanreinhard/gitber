@@ -1,0 +1,24 @@
+<mat-card class="full-width">
+  <mat-card-header>
+    <a target="_blank" [href]="repo.clone_url" mat-raised-button color="primary">
+      <i class="fa fa-share-alt" aria-hidden="true"></i>
+      Fork</a>
+    <div mat-card-avatar class="header-image">
+      <img [src]="repo.owner.avatar_url" [alt]="repo.owner.login"/>
+    </div>
+    <h1>{{repo.name}}</h1>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="row">
+      <div class="col-xs-4">Language</div>
+      <div class="col-xs-8">{{repo.language}}</div>
+    </div>
+    <div class="row">
+      <div class="col-xs-4">File Size</div>
+      <div class="col-xs-8">{{repo.size}}kb</div>
+    </div>
+  </mat-card-content>
+  <h3><i class="fa fa-book"></i> Description</h3>
+  <app-markdown [readme]="readme"></app-markdown>
+  <small>Created on {{repo.created_at}}</small>
+</mat-card>

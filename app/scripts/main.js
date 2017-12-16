@@ -1,179 +1,176 @@
-/**************************
-* Application
-**************************/
-App = Em.Application.create();
+App = angular.module('App', []);
 
-/**************************
-* Models
-**************************/
-App.repo = Em.Object.extend({
- 
-});
-
-App.githubUser = Em.Object.extend({
- 
-});
-
-App.orgMembers = Em.Object.extend({
- 
-});
-
-/**************************
-* Views
-**************************/
-App.SearchTextField = Em.TextField.extend({
-    insertNewline: function(){
-        App.reposController.loadrepos();
-    }
-});
-App.OrganisationSearchTextField = Em.TextField.extend({
-    insertNewline: function(){
-        App.organisationUserController.loadOrganisation();
-    }
-});
 var client='69af424226e15a6396dd';
 var secret='683d05837403207f247939ab21668065352b65db';
 var oauth = '?client_id='+client+'&client_secret='+secret;
-/**************************
-* Controllers
-**************************/
-App.reposController = Em.ArrayController.create({
-    content: [],
-    username: '',
-    loadrepos: function(username,name) {
-        var me = this;
-        var username = me.get("username");
-        if ( username ) {
-            var url = 'https://api.github.com/users/'+username+'/repos'+oauth;
-            App.recentUsersController.addUser(username);
-            me.set('content', []);
-            $.getJSON(url,function(data){
-                me.set('content', []);
-                async.map(
-                  data,
-                  function(repo, callback){
-				  var success = false;
-                    var url = 'https://api.github.com/repos/'+username+'/'+repo.name+'/readme'+oauth;
-                    $.getJSON(url, function(readme){
-						success = true;
-						repo.readmeFile = $.base64Decode(readme.content);
-                      callback(null, repo);
-                    });
-					setTimeout(function() {
-						if (!success)
-						{
-								repo.readmeFile = "No readme found";
-								callback(null, repo);
-						}
-					}, 2200);
-                  },
-                  function(error, reposWithReadme){
-                    $(reposWithReadme).each(function(index,value){
-                      var repoArray = App.repo.create({
-                          name: value.name,
-                          created: value.created_at,
-                          repoUrl: value.clone_url,
-                          language: value.language,
-                          size: value.size,
-                          avatar: value.owner.avatar_url,
-                          owner: value.owner.login,
-                          readme: value.readmeFile
-                      });
-                      me.pushObject(repoArray);
-                  });
-                });
-            });
-        App.githubUserController.loadUser(username);
-        }
+
+
+App.controller('ApplicationController',function($scope,$http){
+  $scope.recentSearches = [];
+  $scope.repoData = [];
+  $scope.orgUsers = [];
+  $scope.userBio = {}
+  $scope.searchText = '';
+
+  // ALL the $http calls should be moved to service but i have kept them in controller for now.
+
+  // to remove search from recentsearches
+  $scope.removeFromSearch = function(username){
+    $scope.recentSearches.splice($scope.recentSearches.indexOf(username),1);
+  }
+
+  // trigegrs on OnSearch from the search text for users
+  // also called from recentSearches list for an item to search again
+  $scope.onSearch = function(searchText)
+  {
+    if(searchText)
+    {
+      var index = $scope.recentSearches.indexOf(searchText);
+
+      if(index === -1)
+      {
+          $scope.recentSearches.push(searchText);
+      }
+      $scope.searchText = searchText;
     }
-});
 
-App.githubUserController = Em.ArrayController.create({
-    content: [],
-    loadUser: function(username,name) {
-        var me = this;
-        if ( username ) {
-            var url = 'https://api.github.com/users/'+username+''+oauth;
-            // push username to recent user array
-            me.set('content', []);
-            $.getJSON(url,function(data){
-                me.set('content', []);
-                $(data).each(function(index,value){
-                    var githubUserArray = App.githubUser.create({
-                        username: value.login,
-                        avatar: value.avatar_url,
-                        name: value.name,
-                        company: value.company,
-                        blog: value.blog,
-                        location: value.location,
-                        email: value.email,
-                        hireable: value.hireable,
-                        bio: value.bio,
-                        repos: value.public_repos,
-                        followers: value.followers,
-                        joined: value.created_at
-                    });
-                    me.pushObject(githubUserArray);
-                })
+    $scope.loadRepos(searchText);
+    $scope.loadUserBio(searchText);
+  }
+
+  // load repos of uses on seach
+  $scope.loadRepos = function(searchText)
+  {
+    if ( searchText )
+    {
+        $scope.repoData= [];
+        var url = 'https://api.github.com/users/'+searchText+'/repos'+oauth;
+        $http.get(url).then(function(res){
+            var data = res.data;
+
+            data.forEach(function(repo)
+            {
+              var repoObj = {
+                  name: repo.name,
+                  created: repo.created_at,
+                  repoUrl: repo.clone_url,
+                  language: repo.language,
+                  size: repo.size,
+                  avatar: repo.owner.avatar_url,
+                  owner: repo.owner.login
+              };
+
+              // getting readMe file now
+              var readmeUrl = 'https://api.github.com/repos/'+searchText+'/'+repo.name+'/readme'+oauth;
+
+              $http.get(readmeUrl).then(function(res)
+              {
+                repoObj.readme= $.base64Decode(res.data.content);
+                $scope.repoData.push(repoObj);
+              },function()
+              {
+                repoObj.readme = "No readme found";
+                $scope.repoData.push(repoObj);
+              });
             });
-        }App.recentUsersController.addUser(username);
+
+        });
     }
-});
+  }
 
-
-App.organisationUserController = Em.ArrayController.create({
-	organisation: '',
-    content: [],
-    loadOrganisation: function(organisation,name) {
-        var me = this;
-		var organisation = me.get("organisation");
-        if ( organisation ) {
-            var url = 'https://api.github.com/orgs/'+organisation+'/members'+oauth;
-            me.set('content', []);
-            $.getJSON(url,function(data){
-                me.set('content', []);
-                $(data).each(function(index,value){
-                    var organisationUserArray = App.githubUser.create({
-                        orgUsername: value.login
-                    });
-                    me.pushObject(organisationUserArray);
-                })
-            });
-        }
-    },
-	searchOrgUser: function(view){
-        App.reposController.set('username', view.context.orgUsername);
-        App.reposController.loadrepos();
+  // load user bio on search
+  $scope.loadUserBio = function(searchText)
+  {
+    if ( searchText ) {
+        var url = 'https://api.github.com/users/'+searchText+''+oauth;
+        // push username to recent user array
+        $http.get(url).then(function(res)
+        {
+                var data = res.data;
+                var user = {
+                    username: data.login,
+                    avatar: data.avatar_url,
+                    name: data.name,
+                    company: data.company,
+                    blog: data.blog,
+                    location: data.location,
+                    email: data.email,
+                    hireable: data.hireable,
+                    bio: data.bio,
+                    repos: data.public_repos,
+                    followers: data.followers,
+                    joined: data.created_at
+                };
+                $scope.userBio = user;
+        });
     }
+  }
+
+  // Load oragnization members
+  $scope.onOrgsMemebersSearch = function(searchText)
+  {
+    if(searchText)
+    {
+      var url = 'https://api.github.com/orgs/'+searchText+'/members'+oauth;
+      $http.get(url).then(function(res)
+      {
+        $scope.orgUsers = res.data.map(function(val){
+          return val.login;
+        })
+
+      });
+    }
+  }
+
 });
 
 
+// search Field component. onSearch is mapped to the function while using the component
+function SearchTextFieldController($scope, $element, $attrs) {
 
- function formatJoinDate(joined) {
-        var joined = Date.parse(joined);
-        return joined.toString("d MMMM yyyy");
-    };
+   var ctrl = this;
 
+   ctrl.modal = '';
 
-////////////////////////////////////////////////////////////////////////////////////////
-App.recentUsersController = Em.ArrayController.create({
-    content: [],
-    addUser: function(name) {
-        if ( this.contains(name) ) this.removeObject(name);
-        this.pushObject(name);
-        if (this.get('content').length > 5){
-            this.get('content').splice(0,1);
-        };
-    },
-    removeUser: function(view){
-        this.removeObject(view.context);
-    },
-    searchAgain: function(view){
-        App.reposController.set('username', view.context);
-        App.reposController.loadrepos();
-    },
-    reverse: function(){
-        return this.toArray().reverse();
-    }.property('@each')
+   ctrl.go = function(){
+     ctrl.onSearch({ searchText: ctrl.modal });
+   }
+
+}
+
+App.component('searchTextField', {
+  templateUrl: 'scripts/search-text-field.html',
+  controller: SearchTextFieldController,
+  bindings: {
+    onSearch: '&',
+    modal: '<'
+  }
 });
 
+
+// user Bio components is just to display the user info. takes user object as prpoperty
+function userBioController(){
+  var ctrl = this;
+}
+
+App.component('userBio', {
+  templateUrl: 'scripts/user-bio.html',
+  controller: userBioController,
+  bindings:  {
+    user: '<'
+  }
+});
+
+
+// user repo compnents is display user repos. takes respos as property
+function userRepositoriesController(){
+  var ctrl = this;
+}
+
+App.component('userRepositories', {
+  templateUrl: 'scripts/user-repositories.html',
+  controller: userRepositoriesController,
+  bindings: {
+    repos: '<'
+  }
+});

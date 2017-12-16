@@ -1,0 +1,26 @@
+<div class="row-fluid">
+  <div id="results" class="white">
+    <p style="padding:5px 10px; border-bottom:1px solid #ccc;  margin-bottom:-1px;" class="lead blue">User Repositories</p>
+        <div class="row-fluid" ng-repeat="repo in $ctrl.repos">
+            <div class="repo">
+                <div class="span12 repoDetails">
+                    <blockquote>
+                        <h3 class="blue" style="margin-bottom:0px;"><a target="_blank" {{bindAttr href="repoUrl"}}>{{repo.name}}</a></h3>
+                        <p><strong>Language:</strong> {{repo.language}}</p>
+                        <p><strong>File Size:</strong> {{repo.size}}kb</p>
+                        <p><strong>Description:</strong></p>
+                        <div class="row-fluid">
+                          <div class="span10">
+                            <pre>{{repo.readme}}</pre>
+                          </div>
+                        </div>
+                        <small>Created on {{repo.created}}</small>
+                    <div class="ribbonWrapper" style="overflow:hidden;">
+                     <a target="_blank" {{bindAttr href="repoUrl"}} href={{repo.repoUrl}}><img class="ribbon" src="images/fork.png" alt="Fork me on GitHub"></a>
+                    </div>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -16,10 +16,10 @@
         <script src="scripts/vendor/jquery.min.js"></script>
         <script src="scripts/vendor/bootstrap/bootstrap.min.js"></script>
         <script src="scripts/vendor/async.js"></script>
-        <script src="http://cloud.github.com/downloads/emberjs/ember.js/ember-0.9.6.min.js"></script>
+        <script src="https://code.angularjs.org/1.5.8/angular.min.js"></script>
         <style>
             h1,h2,h3,h4,h5,h6,p{
-                font-family: 'Roboto', sans-serif;    
+                font-family: 'Roboto', sans-serif;
             }
 			body{
 				background: #abbac4;
@@ -31,7 +31,7 @@
                 -moz-transition: margin-top 0.5s;
                 -o-transition: margin-top 0.5s;
                 -ms-transition: margin-top 0.5s;
-                transition: margin-top 0.5s; 
+                transition: margin-top 0.5s;
                 margin-top:-45px;
             }
             .ribbonWrapper{
@@ -138,13 +138,13 @@
 				background:#fff;
 				z-index:500;
 				width:100%;
-			}	
+			}
 			.white{
 				background:#fff;
 			}
             .emailTag img{
                 -webkit-filter: hue-rotate(50deg);
-            }	
+            }
             .blogtag img{
                 -webkit-filter: hue-rotate(100deg);
             }
@@ -160,7 +160,7 @@
             .phone-button a{
                width:100px;
                height:65px;
-               float:left; 
+               float:left;
 			   margin-right:15px;
 			   margin-bottom:15px;
             }
@@ -188,173 +188,54 @@
 			#userData{margin-bottom:150px;}
         </style>
     </head>
-    <body>
+    <body ng-app="App" ng-controller="ApplicationController">
 	<div class="gitber container" id="tagHeading" style="position:fixed; text-align:center;" data-0="margin-top:-50px;" data-anchor-target="#fitHeader" data-50-top-bottom="margin-top:-50px;" data--250-top-bottom="margin-top:0px;">
 				<p>GitBer!</p>
 	</div>
     <div class="container">
-			
+
             <div class="row-fluid" style="text-align:center;">
                 <p class="gitber" id="fitHeader"><span id="gitber1">G</span><span id="gitber2">i</span><span id="gitber3">t</span><span id="gitber4">B</span><span id="gitber5">e</span><span id="gitber6">r</span><span id="gitber7">!</span><span id="gitber8"><i class="icon-github"></i></span></p>
-            </div>        
+            </div>
             <div class="row-fluid">
                 <div class="span4">
-				<div>
+				          <div>
                     <div class="row-fluid" >
                         <div class="searched white">
                             <div class="input-append" style="margin-top:15px; padding-left:10px;">
-                                <script type="text/x-handlebars"> 
-                                {{view App.SearchTextField placeholder="Github username" valueBinding="App.reposController.username" class="span8"}}
-                                <button class="btn btn-info" {{action "loadrepos" target="App.reposController"}}>Go!</button>
-                                </script>
+                                <search-text-field modal="searchText" on-search="onSearch(searchText)"></search-text-field>
                             </div>
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">Recent Searches</p>
-                            <ul class="unstyled recentSearches table-striped"> 
-                                 <script type="text/x-handlebars"> 
-                                {{#each App.recentUsersController.reverse}} 
-                                    <li> 
-                                        <a href="#" title="view again" {{action "searchAgain" target="App.recentUsersController"}}>{{this}}</a>  <a class="btn btn-info btn-mini pull-right" href="#" title="remove" {{action "removeUser" target="App.recentUsersController"}}>X</a> 
-                                    </li> 
-                                {{/each}} 
-                                </script>
+                            <ul class="unstyled recentSearches table-striped">
+                                    <li ng-repeat="search in recentSearches">
+                                        <a href="#" title="view again" ng-click="onSearch(search)">{{search}}</a>  <a class="btn btn-info btn-mini pull-right" href="#" title="remove" ng-click="removeFromSearch(search)">X</a>
+                                    </li>
                             </ul>
-                        </div>  
+                        </div>
                     </div>
-					
-					<div class="row-fluid" >
+
+					        <div class="row-fluid" >
                         <div class="searched white">
                             <div class="input-append" style="margin-top:15px; padding-left:10px;">
-                                <script type="text/x-handlebars"> 
-                                {{view App.OrganisationSearchTextField placeholder="Organisation Name" valueBinding="App.organisationUserController.organisation" class="span8"}}
-                                <button class="btn btn-info" {{action "loadOrganisation" target="App.organisationUserController"}}>Go!</button>
-                                </script>
+                              <search-text-field on-search="onOrgsMemebersSearch(searchText)"></search-text-field>
                             </div>
                             <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">Organisation Members</p>
-                            <ul class="unstyled recentSearches table-striped" style="max-height:171px; overflow:auto;"> 
-                                 <script type="text/x-handlebars"> 
-                                 {{#each App.organisationUserController}}
-                                    <li> 
-                                        <a href="#" title="view repos" {{action "searchOrgUser" target="App.organisationUserController"}}>{{orgUsername}}</a>
-                                    </li> 
-                                {{/each}} 
-                                </script>
+                            <ul class="unstyled recentSearches table-striped" style="max-height:171px; overflow:auto;">
+                              <li ng-repeat="user in orgUsers">
+                                  <a href="#" title="view repos" ng-click="onSearch(user)" >{{user}}</a>
+                              </li>
                             </ul>
-                        </div>  
-                    </div>
-					
-					
-					
-					
-                    <div class="row-fluid" style="position:relative;">
-                        <div id="userData" class="searched white">
-                            <p style="padding:5px 10px; border-bottom:1px solid #ccc;" class="lead blue">User Bio</p>
-                             <script type="text/x-handlebars"> 
-                            {{#each App.githubUserController}}
-                                <div class="row-fluid">
-                                    <div class="span12" style="padding-left:10px;padding-right:100px;">
-										{{#if name}}<p><strong>Name:</strong> {{name}}</p>{{/if}}
-                                        <p><strong>Username:</strong> {{username}}</p>
-                                        {{#if company}}<p><strong>Company:</strong> {{company}}</p>{{/if}}
-                                        <p><strong>Repos:</strong> {{repos}}</p>
-                                        <p><strong>Followers:</strong> {{followers}}</p>
-                                        <p><strong>Joined on:</strong> {{joined}}</p>
-                                    </div>
-                                    
-                                        <img class="avatar img-polaroid" {{bindAttr src="avatar"}} />
-                                    
-                                </div>
-                                <div class="row-fluid visible-phone phoneButtons">
-                                    <div class="phone-button">
-                                        {{#if email}}
-											<a class="btn btn-primary btn-large" href="mailto:{{unbound email}}"><i class="icon-envelope-alt icon-4x"></i></a>
-										{{/if}}   
-                                    </div>
-                                    <div class="phone-button">
-										 {{#if blog}}
-											<a class="btn btn-warning btn-large" href="{{unbound blog}}" target="_blank"><i class="icon-comments icon-4x"></i></a>
-										 {{/if}}   
-                                    </div>
-                                    <div class="phone-button">
-                                        {{#if location}}
-											<a class="btn btn-danger btn-large" href="{{unbound location}}" target="_blank"><i class="icon-map-marker icon-4x"></i></a>
-										{{/if}}
-                                    </div>
-                                    <div class="phone-button">
-										{{#if hireable}}
-												<a class="btn btn-inverse btn-large" href="{{unbound blog}}" target="_blank"><i class="icon-suitcase icon-4x"></i></a>
-										{{/if}}	
-                                    </div>
-                                </div>
-								<div class="row-fluid hidden-phone" style="position:absolute; margin-top:10px;overflow:hidden;">
-									{{#if email}}
-										<div class="span3">
-											<div class="ribbon emailTag" style="position:relative;">
-												<a href="mailto:{{unbound email}}"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Email</p><i class="icon-envelope-alt icon-2x"></i></span></a>
-											</div>
-										</div>
-									{{/if}}
-									{{#if blog}}
-										<div class="span3">
-											<div class="ribbon blogtag" style="position:relative;">
-												<a href="{{unbound blog}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Blog</p><i class="icon-comments icon-2x"></i></span></a>
-											</div>
-										</div>
-									{{/if}}
-									{{#if location}}
-										<div class="span3">
-											<div class="ribbon localeTag" style="position:relative;">
-												<a href="{{unbound location}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead" style="color:#fff;">Locale</p><i class="icon-map-marker icon-2x"></i></span></a>
-											</div>
-										</div>
-									{{/if}}
-									{{#if hireable}}
-										<div class="span3">
-											<div class="ribbon hireTag" style="position:relative;">
-												<a href="{{unbound blog}}" target="_blank"><img src="images/small-fork.png"><span class="bioDropdown"><p class="lead"  style="color:#fff;">Hire</p><i class="icon-suitcase icon-2x"></i></span></a>
-											</div>
-										</div>
-									{{/if}}
-								</div>	
-                            {{/each}} 
-                            </script>  
                         </div>
                     </div>
-					</div>
+
+                    <div class="row-fluid" style="position:relative;">
+                        <user-bio user="userBio"></user-bio>
+                    </div>
+					        </div>
                 </div>
                 <div class="span8">
-                    <div class="row-fluid">
-					
-                        <div id="results" class="white">
-                            <p style="padding:5px 10px; border-bottom:1px solid #ccc;  margin-bottom:-1px;" class="lead blue">User Repositories</p>
-                             <script type="text/x-handlebars"> 
-                        {{#each App.reposController}}
-                            <div class="row-fluid">
-                                <div class="repo"> 
-                                    <div class="span12 repoDetails">
-                                        <blockquote>
-                                            <h3 class="blue" style="margin-bottom:0px;"><a target="_blank" {{bindAttr href="repoUrl"}}>{{name}}</a></h3>
-                                            <p><strong>Language:</strong> {{language}}</p>
-                                            <p><strong>File Size:</strong> {{size}}kb</p>
-                                            <p><strong>Description:</strong></p> 
-											<div class="row-fluid">
-												<div class="span10">
-													<pre>{{readme}}</pre>
-												</div>
-											</div>	
-                                            
-                                            <small>Created on {{created}}</small>
-                                        <div class="ribbonWrapper" style="overflow:hidden;">
-                                         <a target="_blank" {{bindAttr href="repoUrl"}}><img class="ribbon" src="images/fork.png" alt="Fork me on GitHub"></a>
-                                        </div>
-                                        </blockquote>
-                                    </div>
-                                </div>
-                            </div>   
-                            {{/each}}
-                            </script>
-                        </div>
-                    </div>     
-                </div>    
+                    <user-repositories repos="repoData"> </user-repositories>
+                </div>
              </script>
         </div>
     </div>
@@ -368,9 +249,9 @@
                     </div>
                     <div class="span6">
                         <h1 class="blue">Information about GitBer goes here</h1>
-                    </div>    
-                </div>   
-            </div>    
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- The ribbon -->
@@ -393,7 +274,7 @@
         <script src="scripts/main.js"></script>
         <script src="scripts/vendor/skrollr.min.js"></script>
         <script>
-        
+
 		$(function() {
 		$("#fitHeader").fitText(0.7);
 			skrollr.init({
